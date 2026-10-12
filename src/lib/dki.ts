@@ -5,94 +5,158 @@
  * back the exact search term the visitor typed. This raises relevance and
  * conversion because the page visibly matches the ad that was clicked.
  *
- * Supported query params:
- *   kw_vehicle  -> vehicle noun, e.g. "SUV", "Truck", "Minivan", "Car"
- *   loc         -> location, e.g. "Texas", "Denver"
- *   kw_breed    -> optional breed noun, e.g. "Labrador", "Senior Dog"
+ * SECURITY / COMPLIANCE RULE (V3 — read before editing)
+ * ---------------------------------------------------
+ * Raw URL parameters are NEVER interpolated into the page. The previous
+ * version stripped `<>` and control characters and then injected whatever
+ * remained into the H1 — that is not a sufficient defense: arbitrary query
+ * strings reached the DOM, which is both an XSS vector and an ad-disapproval
+ * risk (a crafted ad click could put any text into the headline).
  *
- * Example:
+ * Instead, each supported keyword maps to a PRE-WRITTEN headline from the
+ * tables below. An ad can choose among a fixed set of approved phrasings; it
+ * can never author new ones. Unknown or hostile values fall back to the
+ * neutral default, so organic traffic and typo-squatting both see a clean
+ * headline rather than leftover template tokens.
+ *
+ * Supported query params (all whitelisted):
+ *   kw_vehicle  -> e.g. "SUV", "Truck", "Minivan"
+ *   loc         -> US state or district name, e.g. "Texas"
+ *   kw_breed    -> e.g. "Labrador", "Senior Dog"
+ *
+ * Example (approved values only):
  *   /?kw_vehicle=SUV&loc=Texas
- *   -> "The SUV Dog Ramp Texans Actually Use"
+ *   -> "The SUV Dog Ramp / Texas Owners Love"
  */
 
 export interface DkiParams {
-  /** Raw vehicle param, or null when absent. */
-  rawVehicle: string | null;
-  /** Raw location param, or null when absent. */
-  rawLocation: string | null;
-  /** Raw breed param, or null when absent. */
-  rawBreed: string | null;
   /**
    * Headline phrase, grammatically correct with or without the param.
    *   kw_vehicle=SUV -> "SUV Dog Ramp"
-   *   (absent)       -> "Dog Car Ramp"
+   *   (absent/unknown) -> "Dog Car Ramp"
    */
   vehiclePhrase: string;
   /**
    * Second headline line.
    *   loc=Texas -> "Texas Owners Love"
-   *   (absent)  -> "Owners Actually Love"
+   *   (absent/unknown) -> "Owners Actually Love"
    */
   locationPhrase: string;
   /**
    * Inline phrase for body copy.
    *   loc=Texas -> "in Texas"
-   *   (absent)  -> "in any vehicle"
+   *   (absent/unknown) -> "in any vehicle"
    */
   locationInline: string;
   /**
    * Breed qualifier for body copy.
    *   kw_breed=Labrador -> "built for Labradors"
-   *   (absent)          -> "built for dogs of every size"
+   *   (absent/unknown) -> "built for dogs of every size"
    */
   breedPhrase: string;
   /** Vehicle noun for mid-sentence use, e.g. "SUV" or "car or SUV". */
   vehicleInline: string;
-  /** True when at least one campaign param was present. */
+  /** True when at least one campaign param produced a personalized phrase. */
   isPersonalized: boolean;
 }
 
-/** Query keys that carry ad-campaign context. */
-const TRACKED_KEYS = ['kw_vehicle', 'loc', 'kw_breed', 'gclid', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+/* --------------------------------------------------------------------------
+   Whitelists — the ONLY values that can personalize the page.
+   Add entries deliberately; each one is pre-written, grammatical copy.
+   -------------------------------------------------------------------------- */
 
-/** Strips control chars and caps length so user input cannot break the page. */
-function sanitize(value: string | null, maxLength = 48): string | null {
+/** Vehicle keywords -> headline phrase + mid-sentence noun. */
+const VEHICLE_KEYWORDS: Record<string, { phrase: string; inline: string }> = {
+  suv: { phrase: 'SUV Dog Ramp', inline: 'SUV' },
+  truck: { phrase: 'Truck Dog Ramp', inline: 'truck' },
+  pickup: { phrase: 'Pickup Truck Dog Ramp', inline: 'pickup truck' },
+  minivan: { phrase: 'Minivan Dog Ramp', inline: 'minivan' },
+  van: { phrase: 'Van Dog Ramp', inline: 'van' },
+  jeep: { phrase: 'Jeep Dog Ramp', inline: 'Jeep' },
+  car: { phrase: 'Car Dog Ramp', inline: 'car' },
+  '4x4': { phrase: '4x4 Dog Ramp', inline: '4x4' },
+  '4wd': { phrase: '4x4 Dog Ramp', inline: '4x4' },
+};
+
+/** Breed keywords -> body-copy qualifier. */
+const BREED_KEYWORDS: Record<string, string> = {
+  labrador: 'built for Labradors',
+  'golden retriever': 'built for Golden Retrievers',
+  'german shepherd': 'built for German Shepherds',
+  corgi: 'built for Corgis',
+  'senior dog': 'built for senior dogs',
+  'large dog': 'built for large dogs',
+};
+
+/** Location keywords: the 50 states plus DC. */
+const LOCATION_KEYWORDS: string[] = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+  'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+  'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+  'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+  'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming',
+  'District of Columbia',
+];
+
+/**
+ * Normalizes a raw param for lookup: lowercase, trimmed, collapsed spaces,
+ * punctuation stripped. This is a LOOKUP KEY ONLY — the normalized value never
+ * reaches the DOM, it is only compared against the whitelists above.
+ */
+function normalize(value: string | null): string | null {
   if (!value) return null;
   const cleaned = value
-    .replace(/[<>]/g, '')
-    .replace(/[\r\n\t]/g, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  if (!cleaned || cleaned.length > maxLength) return null;
-  return cleaned;
+  return cleaned || null;
+}
+
+/** Case-insensitive lookup against a keyword table. */
+function lookup<T>(table: Record<string, T>, value: string | null): T | null {
+  const key = normalize(value);
+  if (!key) return null;
+  return table[key] ?? null;
 }
 
 /**
  * Parse DKI values from the current URL. Safe to call in the browser only.
  *
- * Every returned phrase is designed to read correctly when the param is
- * missing, so organic traffic sees a clean default headline rather than
- * leftover template tokens.
+ * Every returned phrase reads correctly when the param is missing or unknown,
+ * so organic traffic sees a clean default headline rather than leftover
+ * template tokens.
  */
 export function readDkiParams(search: string = typeof window !== 'undefined' ? window.location.search : ''): DkiParams {
   const params = new URLSearchParams(search);
 
-  const rawVehicle = sanitize(params.get('kw_vehicle'));
-  const rawLocation = sanitize(params.get('loc'));
-  const rawBreed = sanitize(params.get('kw_breed'));
+  const vehicle = lookup(VEHICLE_KEYWORDS, params.get('kw_vehicle'));
+  const breed = lookup(BREED_KEYWORDS, params.get('kw_breed'));
+
+  // Location matches the state list case-insensitively, preserving the
+  // list's capitalization ("Texas", not "texas") for display.
+  const locationKey = normalize(params.get('loc'));
+  const location =
+    LOCATION_KEYWORDS.find((name) => name.toLowerCase() === locationKey) ?? null;
 
   return {
-    rawVehicle,
-    rawLocation,
-    rawBreed,
-    vehiclePhrase: rawVehicle ? `${rawVehicle} Dog Ramp` : 'Dog Car Ramp',
-    locationPhrase: rawLocation ? `${rawLocation} Owners Love` : 'Owners Actually Love',
-    locationInline: rawLocation ? `in ${rawLocation}` : 'in any vehicle',
-    breedPhrase: rawBreed ? `built for ${rawBreed}` : 'built for dogs of every size',
-    vehicleInline: rawVehicle ? rawVehicle.toLowerCase() : 'car or SUV',
-    isPersonalized: Boolean(rawVehicle || rawLocation || rawBreed),
+    vehiclePhrase: vehicle ? vehicle.phrase : 'Dog Car Ramp',
+    locationPhrase: location ? `${location} Owners Love` : 'Owners Actually Love',
+    locationInline: location ? `in ${location}` : 'in any vehicle',
+    breedPhrase: breed ?? 'built for dogs of every size',
+    vehicleInline: vehicle ? vehicle.inline : 'car or SUV',
+    isPersonalized: Boolean(vehicle || location || breed),
   };
 }
+
+/**
+ * Query keys that carry ad-campaign context and must be forwarded to the
+ * Shopify checkout so attribution survives the cross-domain hop.
+ */
+const TRACKED_KEYS = ['kw_vehicle', 'loc', 'kw_breed', 'gclid', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
 
 /**
  * Collects every query parameter that must survive the hand-off from this page

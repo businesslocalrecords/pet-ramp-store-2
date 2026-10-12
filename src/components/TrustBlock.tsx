@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Truck, Lock } from 'lucide-react';
+import { POLICY } from '../lib/policy';
 
 interface Guarantee {
   icon: React.ElementType;
@@ -7,8 +8,8 @@ interface Guarantee {
 }
 
 const GUARANTEES: Guarantee[] = [
-  { icon: Truck, label: 'Ships 24H' },
-  { icon: ShieldCheck, label: '100-Day Trial' },
+  { icon: Truck, label: `Ships in ${POLICY.shipsWithinBusinessDays} business day` },
+  { icon: ShieldCheck, label: `${POLICY.returnDays}-Day Trial` },
   { icon: Lock, label: 'Secure SSL' },
 ];
 
@@ -18,6 +19,10 @@ const GUARANTEES: Guarantee[] = [
  * A single horizontal row of three icon+label cells above a divider, instead
  * of stacked paragraphs with descriptions. Institutional, scannable, and it
  * answers the three checkout objections (speed, risk, security) in one glance.
+ *
+ * All labels are derived from lib/policy.ts. The old copy promised a
+ * "100-Day Trial" and lifetime frame coverage; the real policy is 30 days and
+ * a 12-month hardware warranty.
  */
 export const TrustBlock: React.FC = () => {
   return (
@@ -34,8 +39,8 @@ export const TrustBlock: React.FC = () => {
       </div>
 
       <p className="mt-3 text-center text-[11px] leading-relaxed text-gray-500">
-        Try it for 100 days. If your dog still will not use it, full refund.
-        Frame, hinge and surface covered for as long as you own it.
+        Try it for {POLICY.returnDays} days. If your dog still will not use it, full refund.
+        Frame, hinge and surface covered by the {POLICY.warrantyMonths}-month hardware warranty.
       </p>
     </div>
   );

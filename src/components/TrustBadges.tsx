@@ -1,24 +1,27 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
+import { POLICY } from '../lib/policy';
 
+/**
+ * Trust badges — guarantees the store actually makes.
+ *
+ * The "Vet Approved" badge (and its SVG) was deleted in V3: the store has no
+ * veterinary endorsement, and implying one is both an ad-policy and an FTC
+ * problem. The remaining badges are in-house artwork matching the real policy
+ * values in src/lib/policy.ts.
+ */
 const badges = [
   {
     src: '/assets/badges/30-day-guarantee.svg',
-    alt: '30-day money-back guarantee',
-    title: '30-Day Guarantee',
-    desc: 'Full refund, no questions asked',
+    alt: `${POLICY.returnDays}-day money-back guarantee`,
+    title: `${POLICY.returnDays}-Day Guarantee`,
+    desc: `Full refund within ${POLICY.returnDays} days of delivery`,
   },
   {
     src: '/assets/badges/free-shipping.svg',
     alt: 'Free insured shipping',
     title: 'Free Shipping',
-    desc: 'Insured express, every order',
-  },
-  {
-    src: '/assets/badges/vet-approved.svg',
-    alt: 'Veterinarian approved design',
-    title: 'Vet Approved',
-    desc: 'Joint-safe 24–28° slope',
+    desc: 'Insured, on every order',
   },
   {
     src: '/assets/badges/secure-checkout.svg',
@@ -37,11 +40,11 @@ export const TrustBadges: React.FC = () => {
           <p className="mt-2 text-stone-400 text-sm">Every order is backed by promises we actually keep</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {badges.map((badge, idx) => (
             <div
               key={idx}
-              className="flex flex-col items-center text-center p-6 rounded-3xl bg-stone-800/50 border border-stone-800 hover:border-amber-500/30 hover:bg-stone-800 transition-all duration-300"
+              className="flex flex-col items-center text-center p-6 rounded-2xl bg-stone-800/50 border border-stone-800"
             >
               <img
                 src={badge.src}

@@ -1,5 +1,23 @@
 import React from 'react';
 import { Star, Quote, BadgeCheck, ThumbsUp } from 'lucide-react';
+import { GATES } from '../lib/assets';
+
+/**
+ * Verified buyer reviews — GATED, data empty by design.
+ *
+ * Renders nothing until `GATES.testimonials` is enabled, and even then the
+ * list below must be filled from a REAL review source (Judge.me, Shopify
+ * Product Reviews, or a manual audit of order confirmations). The previous
+ * version shipped invented reviews — fake names, dates, "142 found this
+ * helpful" counts, a 4.9/2,847 aggregate, "94% would buy again", "12,000+
+ * ramps delivered". Publishing invented reviews violates FTC endorsement
+ * rules and ad-network policy, so the data is empty and the section shows an
+ * explicit empty state until real data is wired in.
+ *
+ * To enable: replace `reviews` with the fetched data, restore the aggregate
+ * header and summary strip from real values, then flip the gate in
+ * src/lib/assets.ts and cross the item off LAUNCH_BLOCKERS.md.
+ */
 
 interface Review {
   name: string;
@@ -12,68 +30,8 @@ interface Review {
   helpful: number;
 }
 
-const reviews: Review[] = [
-  {
-    name: 'Marcus T.',
-    location: 'Austin, TX',
-    dog: 'German Shepherd, 4 yrs',
-    rating: 5,
-    title: 'My back is saved — and Zeus loves it',
-    body: 'I am 61 and lifting an 85 lb shepherd into my F-150 was destroying my back. First day on this ramp he walked right up like he had done it his whole life. The non-slip surface actually grips his nails. Best purchase I have made for my dog.',
-    date: '2 weeks ago',
-    helpful: 142,
-  },
-  {
-    name: 'Priya R.',
-    location: 'Denver, CO',
-    dog: 'Golden Retriever, 9 yrs',
-    rating: 5,
-    title: 'Our senior dog is hiking again',
-    body: 'Bella has hip dysplasia and jumping into the car became impossible. Her vet recommended a ramp at a shallow angle and this one measured up. We took her on three trail trips since and she hops right in. Worth every penny.',
-    date: '1 month ago',
-    helpful: 98,
-  },
-  {
-    name: 'Dana K.',
-    location: 'Portland, OR',
-    dog: 'Corgi, 6 yrs',
-    rating: 5,
-    title: 'Even works for a low corgi',
-    body: 'I thought a ramp would be overkill for a corgi but his back is long and jumping was getting risky. The compact size fits my forester perfectly and it folds flat enough to store behind the seat. Shipping was two days.',
-    date: '3 weeks ago',
-    helpful: 76,
-  },
-  {
-    name: 'James W.',
-    location: 'Chicago, IL',
-    dog: 'Great Dane mix, 3 yrs',
-    rating: 5,
-    title: 'Holds 140 lbs without flexing',
-    body: 'I was skeptical about the weight rating but our Dane is 140 lbs and the ramp does not flex or creak at all. The side rails give him confidence and he does not shy away from the edge. Solid engineering.',
-    date: '1 week ago',
-    helpful: 64,
-  },
-  {
-    name: 'Elena S.',
-    location: 'Miami, FL',
-    dog: 'Labrador, 11 yrs',
-    rating: 5,
-    title: 'Arthritis made this a necessity',
-    body: 'Rocky refused to get in the car after his arthritis got bad. Within a week of using the ramp daily he walks up on his own. It is sturdy but light enough for me to carry one-handed. Absolutely recommend.',
-    date: '5 days ago',
-    helpful: 51,
-  },
-  {
-    name: 'Tom H.',
-    location: 'Seattle, WA',
-    dog: 'Husky, 5 yrs',
-    rating: 4,
-    title: 'Great ramp, wish the mat was bigger',
-    body: 'The ramp itself is excellent — very grippy and stable even on wet pavement. The non-slip mat is a nice idea but a bit small for my SUV bumper. Minor issue on an otherwise fantastic product. Support was responsive when I emailed.',
-    date: '2 months ago',
-    helpful: 33,
-  },
-];
+/** Empty until a real review source is wired in. Do not hand-fill. */
+const reviews: Review[] = [];
 
 const Stars: React.FC<{ rating: number; size?: string }> = ({ rating, size = 'w-4 h-4' }) => (
   <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
@@ -112,90 +70,80 @@ const Avatar: React.FC<{ name: string }> = ({ name }) => {
 };
 
 export const Testimonials: React.FC = () => {
+  // Gate after the hooks so hook order is stable across renders.
+  if (!GATES.testimonials) return null;
+
   return (
-    <section id="reviews" className="py-20 lg:py-24 px-4 sm:px-6 bg-white text-stone-900 scroll-mt-16">
+    <section id="reviews" className="py-12 sm:py-16 px-4 sm:px-6 bg-white text-stone-900 scroll-mt-24">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-100 text-amber-800">
-            <BadgeCheck className="w-3.5 h-3.5" /> Verified Buyer Reviews
+            <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" /> Verified Buyer Reviews
           </span>
-          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
-            Loved by Dogs, Trusted by Owners
+          <h2 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight">
+            What Owners Report
           </h2>
+        </div>
 
-          {/* Aggregate rating */}
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-stone-50 border border-stone-200">
-              <span className="text-4xl font-extrabold">4.9</span>
-              <div>
-                <Stars rating={5} size="w-5 h-5" />
-                <p className="text-xs text-stone-500 mt-0.5">2,847 verified reviews</p>
-              </div>
-            </div>
-            <div className="text-sm text-stone-600 text-left space-y-1">
-              <p className="flex items-center gap-2">
-                <span className="font-semibold text-stone-900">96%</span> would buy again
-              </p>
-              <p className="flex items-center gap-2">
-                <span className="font-semibold text-stone-900">94%</span> saw their dog use it within 24 hours
-              </p>
-            </div>
+        {reviews.length === 0 ? (
+          /* Loud empty state — the gate must never ship invented reviews. */
+          <div className="rounded-2xl border-2 border-dashed border-stone-300 p-10 text-center">
+            <h3 className="font-bold text-stone-900">No review source connected</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
+              This section is gated on purpose. Connect a real review source in{' '}
+              <code className="font-mono text-xs">src/components/Testimonials.tsx</code> (see the
+              file header) before enabling <code className="font-mono text-xs">GATES.testimonials</code>{' '}
+              in <code className="font-mono text-xs">src/lib/assets.ts</code>.
+            </p>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Review grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((review, idx) => (
+                <div
+                  key={idx}
+                  className="relative flex flex-col p-6 rounded-3xl bg-stone-50 border border-stone-200 hover:border-stone-300 hover:shadow-lg transition-all duration-300"
+                >
+                  <Quote className="absolute top-5 right-5 w-8 h-8 text-stone-200" aria-hidden="true" />
 
-        {/* Review grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review, idx) => (
-            <div
-              key={idx}
-              className="relative flex flex-col p-6 rounded-3xl bg-stone-50 border border-stone-200 hover:border-stone-300 hover:shadow-lg transition-all duration-300"
-            >
-              <Quote className="absolute top-5 right-5 w-8 h-8 text-stone-200" />
-
-              <div className="flex items-center gap-3 mb-4">
-                <Avatar name={review.name} />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-sm truncate">{review.name}</span>
-                    <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <Avatar name={review.name} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-sm truncate">{review.name}</span>
+                        <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                      </div>
+                      <p className="text-xs text-stone-500 truncate">
+                        {review.location} &middot; {review.dog}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-stone-500 truncate">
-                    {review.location} &middot; {review.dog}
-                  </p>
+
+                  <Stars rating={review.rating} />
+
+                  <h3 className="mt-3 font-bold text-base leading-snug">{review.title}</h3>
+                  <p className="mt-2 text-sm text-stone-600 leading-relaxed flex-1">{review.body}</p>
+
+                  <div className="mt-4 pt-4 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
+                    <span>{review.date}</span>
+                    <span className="flex items-center gap-1.5">
+                      <ThumbsUp className="w-3.5 h-3.5" aria-hidden="true" />
+                      {review.helpful} found this helpful
+                    </span>
+                  </div>
                 </div>
-              </div>
-
-              <Stars rating={review.rating} />
-
-              <h3 className="mt-3 font-bold text-base leading-snug">{review.title}</h3>
-              <p className="mt-2 text-sm text-stone-600 leading-relaxed flex-1">{review.body}</p>
-
-              <div className="mt-4 pt-4 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
-                <span>{review.date}</span>
-                <span className="flex items-center gap-1.5">
-                  <ThumbsUp className="w-3.5 h-3.5" />
-                  {review.helpful} found this helpful
-                </span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Trust summary strip */}
-        <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { k: '2,847', v: 'Verified reviews' },
-            { k: '4.9/5', v: 'Average rating' },
-            { k: '12,000+', v: 'Ramps delivered' },
-            { k: '96%', v: 'Would recommend' },
-          ].map((item, i) => (
-            <div key={i} className="text-center p-5 rounded-2xl bg-stone-900 text-stone-100">
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-400">{item.k}</div>
-              <div className="mt-1 text-xs text-stone-400">{item.v}</div>
-            </div>
-          ))}
-        </div>
+            {/*
+              Aggregate rating + summary strip (verified-review counts, average
+              rating, "would recommend") belong here, rendered ONLY from the
+              connected review source's real numbers.
+            */}
+          </>
+        )}
       </div>
     </section>
   );

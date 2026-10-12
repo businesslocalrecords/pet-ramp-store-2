@@ -400,8 +400,10 @@ async function findCollectionByHandle(handle) {
  * Hero product and supporting catalog.
  *
  * Copy is written for a premium DTC voice rather than copied from Chewy:
- * emotional triggers (joint pain, saving the owner's back, vet-recommended
- * safety) lead every description.
+ * emotional triggers (joint pain, saving the owner's back) lead every
+ * description. Every number in the copy is a published specification or a
+ * policy value (30-day money-back guarantee, 12-month hardware warranty) —
+ * no review counts, no "vet-approved", no cure claims.
  */
 const CATALOG = [
   /* ------------------------------- HERO ------------------------------- */
@@ -421,58 +423,60 @@ const CATALOG = [
     inventoryQuantity: 47,
     trackInventory: true,
     options: ['Size'],
+    /**
+     * One variant per size. The storefront's size finder and buy box resolve
+     * these by title (see RAMP_VARIANT_MATCHERS in src/lib/offers.ts), so the
+     * titles must keep containing "62" / "70".
+     */
     variants: [
-      { option: 'Standard (62")', price: 79.99, compareAt: 139.99, sku: 'PGR-RAMP-STD' },
+      { option: 'Standard (62")', price: 79.99, compareAt: 139.99, sku: 'PGR-RAMP-STD', inventory: 47 },
+      { option: 'Extended (70")', price: 119.99, compareAt: 179.99, sku: 'PGR-RAMP-EXT', inventory: 25 },
     ],
     excerpt:
-      'Stop the joint damage before it starts. A 150 lb-rated, 10 lb-light ramp with PawGrip\u2122 Anti-Slip Tread, rated by 2,800+ owners.',
+      'A 150 lb-rated, 10 lb-light telescoping ramp with PawGrip\u2122 Anti-Slip Tread and high side rails. Extended configuration rated to 250 lb.',
     description: `
 <h2>Don't Wait Until They Can't Jump Anymore</h2>
 <p>Every time your dog launches out of an SUV, the landing loads their front
-elbows with roughly <strong>4x their body weight</strong>. For a 70 lb
-Retriever, that is 280 lbs of force on joints that were never built to take
-it. Do that twice a day for five years and you do not get "old age" â€” you get
-early arthritis, and a vet bill that makes this ramp look very cheap.</p>
-
-<p>The <strong>PawGrip Pro Foldable Dog Car Ramp</strong> turns that impact
-into a walk. A shallow, vet-approved slope means your dog steps in and out
-under their own power, and your back never gets involved.</p>
+elbows with a sudden force on joints that were never built to take it, twice
+a day, for years. The PawGrip Pro Foldable Dog Car Ramp turns that launch
+into a walk: a shallow, gentle slope means your dog steps in and out under
+their own power, and your back never gets involved.</p>
 
 <h3>Why owners switch to PawGrip Pro</h3>
 <ul>
-  <li><strong>PawGrip\u2122 Anti-Slip Tread</strong> â€” a proprietary textured
-      surface that grips nails instead of letting them skate. The single most
-      common reason dogs refuse a ramp is a slick deck, and this one is not
+  <li><strong>PawGrip\u2122 Anti-Slip Tread</strong> — a textured
+      surface that grips nails instead of letting them skate. A slick deck
+      is the single most common reason dogs refuse a ramp; this one is not
       slick.</li>
-  <li><strong>Independently rated to 150 lbs</strong> â€” tested well past the
-      rating with no frame flex. Handles Labs, Shepherds, Goldens and Mastiffs.</li>
-  <li><strong>10 lbs, one-handed</strong> â€” lifts in and out of the car
-      between stops. No two-person lift, no dropping it on your shin.</li>
-  <li><strong>62" unfolded length</strong> â€” long enough to keep a gentle
+  <li><strong>Published ratings: 150 lb (Compact) / 250 lb (Extended)</strong>
+      — choose the size whose rating sits above your dog.</li>
+  <li><strong>10 lbs, one-handed</strong> — the Compact lifts in and out
+      of the car between stops. No two-person lift.</li>
+  <li><strong>62" or 70" unfolded</strong> — long enough to keep a gentle
       incline out of SUVs, trucks and vans instead of the steep ladder angle
-      that short ramps force on you.</li>
-  <li><strong>High side rails</strong> â€” a nervous dog cannot slide off the
-      edge, which is why 94% of owners report their dog using it within 24 hours.</li>
+      that short ramps force on you. Use the size finder on the product page
+      to see the exact slope for your vehicle.</li>
+  <li><strong>High side rails</strong> — a nervous dog cannot slide off the
+      edge.</li>
 </ul>
-
-<h3>The math nobody tells you about</h3>
-<p>A single vet visit for mobility work starts around $250. Joint supplements
-run $30 a month, forever. Surgery runs four figures. This ramp costs less than
-one consult, and it works on the day it arrives.</p>
 
 <h3>What's in the box</h3>
 <ul>
-  <li>PawGrip Pro Foldable Dog Car Ramp (Standard, 62")</li>
+  <li>PawGrip Pro Foldable Dog Car Ramp (Compact, 62")</li>
   <li>Safety latch for locked, flat storage</li>
   <li>Quick-start fit card for your vehicle height</li>
-  <li>100-day joint-safe guarantee card</li>
+  <li>30-day money-back guarantee card</li>
 </ul>
 
 <p><strong>Specifications</strong><br/>
-Unfolded: 62" L x 16" W x 4" H &middot; Folded: 31"<br/>
-Weight capacity: 150 lbs &middot; Ramp weight: 10 lbs<br/>
-Surface: PawGrip\u2122 Anti-Slip Tread &middot; Side rails: yes<br/>
-Feet: rubber, non-slip &middot; Made in the USA</p>
+Compact: unfolded 62" L x 16" W x 4" H · folded 31" · rated 150 lb · 10 lbs<br/>
+Extended: unfolded 70" L x 18" W x 4" H · folded 35" · rated 250 lb<br/>
+Surface: PawGrip\u2122 Anti-Slip Tread · Side rails: yes<br/>
+Feet: rubber, non-slip</p>
+
+<p><strong>Guarantee:</strong> 30 days to try the ramp in your own car — used
+or unused — with a prepaid return label and a full refund. Every ramp also
+carries a 12-month hardware warranty against manufacturing defects.</p>
 `,
   },
 
@@ -523,7 +527,7 @@ stops moving.</em></p>
   {
     key: 'carTether',
     handle: 'crash-tested-adjustable-car-safety-tether',
-    title: 'Crash-Tested Adjustable Car Safety Tether',
+    title: 'Adjustable Car Safety Tether',
     productType: 'Car Safety',
     tags: ['post-purchase-upsell', 'Car Mobility', 'bestseller'],
     price: 19.99,
@@ -540,23 +544,22 @@ stops moving.</em></p>
       { option: 'Long (for trucks)', price: 22.99, compareAt: 38.0, sku: 'PGR-TETHER-LNG' },
     ],
     excerpt:
-      'A ramp protects the joints on the way in. A tested tether keeps them safe for the whole drive. Attaches to any harness.',
+      'A ramp protects the joints on the way in. A tether keeps your dog secured for the whole drive. Attaches to any harness.',
     description: `
 <h2>You Fixed the Getting In. Now Fix the Drive.</h2>
-<p>An untethered 70 lb dog becomes a 2,000 lb projectile in a 30 mph
-collision. That is not a scare tactic â€” it is the reason crash-test standards
-exist for pet restraints, and the reason a ramp alone only solves half the
-problem.</p>
+<p>An untethered dog is free to move around the cabin during a journey — and
+a sudden stop or turn sends them forward. That is the reason pet restraints
+exist, and the reason a ramp alone only solves half the problem.</p>
 
-<p>The <strong>PawGrip Crash-Tested Tether</strong> clips to any standard
-harness and anchors to your seatbelt. The webbing is load-rated well above the
-working limit, and the adjustment keeps enough slack to sit and lie down
-without letting them roam the cabin.</p>
+<p>The <strong>PawGrip Adjustable Car Safety Tether</strong> clips to any
+standard harness with a rear clip and anchors to your seatbelt. The
+adjustment keeps enough slack to sit and lie down comfortably without
+letting them roam the cabin.</p>
 
 <ul>
   <li>Attaches to any harness with a rear clip</li>
-  <li>Adjustable length â€” sit, stand or lie down comfortably</li>
-  <li>Load-rated webbing, not elastic bungee cord</li>
+  <li>Adjustable length — sit, stand or lie down comfortably</li>
+  <li>Sturdy webbing, not elastic bungee cord</li>
   <li>Fits every vehicle, front or rear seat</li>
 </ul>
 
@@ -572,6 +575,9 @@ on the same order more often than any other accessory.</p>
     title: 'Orthopedic Foam Bed Steps (For Small & Senior Dogs)',
     productType: 'Pet Steps',
     tags: ['post-purchase-upsell', 'Home Mobility'],
+    // UNPUBLISHED (owner decision, V3): exists in the catalog for future use
+    // but stays DRAFT so it cannot appear in Shopping/PMax feeds yet.
+    status: 'DRAFT',
     price: 65.0,
     compareAt: 99.0,
     cost: 26.0,
@@ -590,13 +596,12 @@ on the same order more often than any other accessory.</p>
     description: `
 <h2>The Car Was Never the Only Problem</h2>
 <p>Most owners buy a ramp for the SUV, then realise their dog has been
-struggling with the couch for two years. Same physics, same joint damage,
-just a shorter drop â€” repeated hundreds more times a day.</p>
+struggling with the couch for two years. Same problem, same joint stress,
+just a shorter drop — repeated hundreds more times a day.</p>
 
-<p>Our <strong>Orthopedic Foam Bed Steps</strong> use the same 4x body-weight
-logic as the ramp. Four shallow steps instead of one launch, on
-high-density foam that supports senior joints and does not collapse like
-cheap hollow plastic stairs.</p>
+<p>Our <strong>Orthopedic Foam Bed Steps</strong> break that drop into four
+shallow steps, on high-density foam that supports senior joints and does not
+collapse like cheap hollow plastic stairs.</p>
 
 <ul>
   <li>High-density orthopedic foam core</li>
@@ -615,9 +620,13 @@ before the jump.</p>
   {
     key: 'jointChews',
     handle: 'advanced-hip-joint-soft-chews',
-    title: 'Advanced Hip & Joint Soft Chews (Vet Formulated)',
+    title: 'Advanced Hip & Joint Soft Chews',
     productType: 'Supplement',
     tags: ['post-purchase-upsell', 'Joint Care', 'subscription-eligible'],
+    // UNPUBLISHED (owner decision, V3): kept DRAFT — a supplement is a
+    // regulated product category; do not advertise it before the claims and
+    // label are reviewed.
+    status: 'DRAFT',
     price: 29.99,
     compareAt: 45.0,
     cost: 9.0,
@@ -632,23 +641,20 @@ before the jump.</p>
       { option: '30-Day Trial', price: 14.99, compareAt: 22.0, sku: 'PGR-JOINT-30' },
     ],
     excerpt:
-      'Vet-formulated glucosamine, chondroitin and MSM soft chews. The daily half of a complete joint-care routine.',
+      'Glucosamine, chondroitin and MSM soft chews. The daily half of a complete joint-care routine.',
     description: `
 <h2>A Ramp Reduces the Damage. It Does Not Reverse It.</h2>
-<p>Joint wear already happened does not fix itself. Once a dog is limping or
-stiff in the morning, you need two things working together: <strong>less
-load</strong> (the ramp, the steps, no jumping) and <strong>daily
-support</strong> (supplementation).</p>
+<p>Once a dog is limping or stiff in the morning, owners usually work on two
+things at once: <strong>less load</strong> (the ramp, the steps, no jumping)
+and <strong>daily support</strong> (supplementation).</p>
 
-<p><strong>Advanced Hip &amp; Joint Soft Chews</strong> are formulated with
-veterinarians around the trio that actually has evidence behind it â€”
-glucosamine, chondroitin and MSM â€” in a soft chew dogs treat as a treat, not
-a pill fight.</p>
+<p><strong>Advanced Hip &amp; Joint Soft Chews</strong> combine the trio that
+has the most evidence behind it — glucosamine, chondroitin and MSM — in a
+soft chew dogs treat as a treat, not a pill fight.</p>
 
 <ul>
-  <li>Vet-formulated, made in the USA</li>
   <li>Glucosamine + chondroitin + MSM</li>
-  <li>Soft chew â€” no pilling, no hiding it in cheese</li>
+  <li>Soft chew — no pilling, no hiding it in cheese</li>
   <li>Available on Subscribe &amp; Save so it never runs out</li>
 </ul>
 
@@ -697,10 +703,24 @@ try {
   PRIOR = {};
 }
 
+/**
+ * Variant "signature": the option/price/sku set a product is supposed to end
+ * up with. Idempotency compares this against the manifest, so adding a new
+ * size (e.g. the Extended 70″ variant) re-syncs variants on the next run
+ * without duplicating them — productVariantsBulkCreate matches on option
+ * values, so re-running updates rather than appends.
+ */
+function variantSignature(item) {
+  return JSON.stringify(
+    item.variants.map((v) => [v.option, v.price, v.compareAt, v.sku])
+  );
+}
+
 async function seedProducts() {
   log('\n── Products ─────────────────────────────────────────────');
   for (const item of CATALOG) {
     const prior = PRIOR.products?.[item.key];
+    const signature = variantSignature(item);
     // Manifest takes priority: it is authoritative for IDs we created ourselves
     const existing = prior?.id
       ? { id: prior.id, title: item.title, handle: item.handle, status: 'ACTIVE' }
@@ -735,7 +755,8 @@ async function seedProducts() {
       productType: item.productType,
       tags: item.tags,
       vendor: 'PawGrip Pro',
-      status: 'ACTIVE',
+      // DRAFT products (bed steps, joint chews) are created but unpublished.
+      status: item.status ?? 'ACTIVE',
       productOptions: [
         {
           name: item.options[0],
@@ -764,7 +785,7 @@ async function seedProducts() {
             descriptionHtml: item.description,
             productType: item.productType,
             tags: item.tags,
-            status: 'ACTIVE',
+            status: item.status ?? 'ACTIVE',
           },
         }
       );
@@ -781,6 +802,7 @@ async function seedProducts() {
         updated: true,
         variantsCreated: prior?.variantsCreated === true,
         variantCount: prior?.variantCount ?? null,
+        variantSignature: signature,
       };
     } else {
       // STEP 1 — create the product with its options.
@@ -808,9 +830,11 @@ async function seedProducts() {
       ok(`created ${created.handle} — ${created.title}`);
 
       // STEP 2 — bulk-create the variants (price, stock, sku, cost).
-      // Skipped when the manifest records variants from a previous run, so a
-      // re-run updates the product without appending a second set of variants.
-      if (prior?.variantsCreated) {
+      // Skipped when the manifest records the SAME variant set from a
+      // previous run, so a plain re-run updates the product without
+      // touching variants. A changed signature (new size, new price) forces
+      // a re-sync, which updates matching option values in place.
+      if (prior?.variantsCreated && prior?.variantSignature === signature) {
         ok(`  variants already provisioned by an earlier run — skipping (${prior.variantCount ?? '?'} on record)`);
         manifest.products[item.key] = {
           handle: item.handle,
@@ -820,8 +844,13 @@ async function seedProducts() {
           stock: item.inventoryQuantity,
           variantsCreated: true,
           variantCount: prior.variantCount,
+          variantSignature: signature,
         };
         continue;
+      }
+
+      if (prior?.variantsCreated && prior?.variantSignature !== signature) {
+        log(`  variant set changed since the last run — re-syncing variants (${signature})`);
       }
 
       let createdVariantCount = 0;
@@ -847,8 +876,9 @@ async function seedProducts() {
               inventoryPolicy: 'DENY',
               // InventoryLevelInput takes availableQuantity + locationId.
               // Passing `available` here fails with "Field is not defined".
+              // Per-variant inventory wins over the product-level default.
               ...(item.trackInventory && LOCATION_ID
-                ? { inventoryQuantities: [{ availableQuantity: item.inventoryQuantity, locationId: LOCATION_ID }] }
+                ? { inventoryQuantities: [{ availableQuantity: v.inventory ?? item.inventoryQuantity, locationId: LOCATION_ID }] }
                 : {}),
               barcode: item.barcode || undefined,
               inventoryItem: {
@@ -883,6 +913,7 @@ async function seedProducts() {
         stock: item.inventoryQuantity,
         variantsCreated: createdVariantCount > 0,
         variantCount: createdVariantCount,
+        variantSignature: signature,
       };
     }
   }
@@ -899,7 +930,9 @@ async function publishToOnlineStore() {
   log('\n── Publish to sales channels ───────────────────────────');
 
   if (DRY_RUN) {
-    log('  (dry-run) would publish all products to every sales channel');
+    const drafts = CATALOG.filter((c) => (c.status ?? 'ACTIVE') === 'DRAFT').map((c) => c.handle);
+    log(`  (dry-run) would publish ${CATALOG.length - drafts.length} of ${CATALOG.length} product(s) to every sales channel`);
+    if (drafts.length) warn(`(dry-run) would keep DRAFT (unpublished): ${drafts.join(', ')}`);
     return;
   }
   if (VERIFY_ONLY) {
@@ -919,9 +952,18 @@ async function publishToOnlineStore() {
     return;
   }
 
+  // Only publish products whose catalog status is ACTIVE. DRAFT products
+  // (bed steps, joint chews) are created for internal use but must not
+  // reach any sales channel.
+  const statusByHandle = new Map(CATALOG.map((c) => [c.handle, c.status ?? 'ACTIVE']));
   const ids = Object.values(manifest.products)
-    .filter((p) => p.id)
+    .filter((p) => p.id && (statusByHandle.get(p.handle) ?? 'ACTIVE') !== 'DRAFT')
     .map((p) => p.id);
+
+  const skipped = CATALOG.filter((c) => (c.status ?? 'ACTIVE') === 'DRAFT').map((c) => c.handle);
+  if (skipped.length) {
+    warn(`Kept DRAFT (not published): ${skipped.join(', ')}`);
+  }
 
   if (ids.length === 0) {
     warn('No product ids to publish.');

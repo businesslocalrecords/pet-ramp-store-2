@@ -15,8 +15,29 @@
   NODE_VERSION = "22"
 
 # The site is a single client-rendered page with no router, so no SPA
-# rewrite is required. This rule is future-proofing in case routes are added.
+# rewrite is required for it. Static pages (shipping, returns, warranty,
+# privacy, terms, contact, about, guide) live as real files in public/, and
+# Netlify serves an existing file before applying this rewrite, so the
+# catch-all only affects unknown paths.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# ---------------------------------------------------------------------------
+# Security headers
+# ---------------------------------------------------------------------------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Long-cache the hashed build assets; index.html must stay revalidatable.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

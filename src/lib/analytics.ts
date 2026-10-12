@@ -173,51 +173,93 @@ export function trackBeginCheckout(items: Array<{ item_id: string; item_name: st
   });
 }
 
-/**
- * Track purchase (call on checkout completion / thank you page)
- */
-export function trackPurchase(
-  transactionId: string,
-  items: Array<{ item_id: string; item_name: string; price: number; quantity: number }>,
-  currency = 'USD',
-  shipping = 0,
-  tax = 0
-) {
-  const value = items.reduce((sum, i) => sum + i.price * i.quantity, 0) + shipping + tax;
-  trackEvent({
-    event_name: 'purchase',
-    currency,
-    value,
-    items,
-    content_ids: items.map(i => i.item_id),
-    content_type: 'product',
-  });
+/* ==========================================================================
+   Custom events (V3) — funnel signals beyond the standard e-commerce set
+   ========================================================================== */
 
-  // Google Ads needs transaction_id for purchase
-  if (window.gtag) {
-    window.gtag('event', 'purchase', {
-      transaction_id: transactionId,
-      currency,
-      value,
-      items,
-      shipping,
-      tax,
-    });
-  }
-  if (window.fbq) {
-    window.fbq('track', 'Purchase', {
-      currency,
-      value,
-      content_ids: items.map(i => i.item_id),
-      content_type: 'product',
-      contents: items.map(item => ({
-        id: item.item_id,
-        quantity: item.quantity,
-        item_price: item.price,
-      })),
-    });
-  }
+/** Visitor used the size finder. `size` is 'standard' | 'extended'. */
+export function trackSizeFinderUsed(params: {
+  size: string;
+  vehicleHeightIn: number;
+  slopeDeg: number;
+}) {
+  trackEvent({
+    event_name: 'size_finder_used',
+    value: params.vehicleHeightIn,
+    items: [
+      {
+        item_id: `size_finder:${params.size}`,
+        item_name: `Size finder — ${params.size}`,
+        quantity: 1,
+        price: params.slopeDeg,
+      },
+    ],
+  });
 }
+
+/** Visitor expanded an FAQ entry. `question` is the question text. */
+export function trackFaqOpen(question: string) {
+  trackEvent({
+    event_name: 'faq_open',
+    items: [
+      {
+        item_id: 'faq',
+        item_name: question.slice(0, 120),
+        quantity: 1,
+        price: 0,
+      },
+    ],
+  });
+}
+
+/** Contact or lead form submitted. `form` is the Netlify form name. */
+export function trackLeadSubmit(form: string) {
+  trackEvent({
+    event_name: 'lead_submit',
+    items: [
+      {
+        item_id: form,
+        item_name: `Lead — ${form}`,
+        quantity: 1,
+        price: 0,
+      },
+    ],
+  });
+}
+
+/** Founding-tester application submitted. */
+export function trackTesterApply() {
+  trackEvent({
+    event_name: 'tester_apply',
+    items: [
+      {
+        item_id: 'founding-tester',
+        item_name: 'Founding tester application',
+        quantity: 1,
+        price: 0,
+      },
+    ],
+  });
+}
+
+/* ==========================================================================
+   Purchase tracking — DELIBERATELY NOT IMPLEMENTED HERE
+   ==========================================================================
+   The old trackPurchase() / pushPurchaseCompleteDataLayer() functions could
+   never execute: with headless checkout the thank-you page lives on Shopify's
+   checkout domain (shop.com/checkouts/...), not on this app, so this code
+   never loads after payment.
+
+   Purchase conversion tracking therefore belongs in the Shopify Customer
+   Events custom pixel:
+     Shopify Admin -> Settings -> Customer events -> Add custom pixel
+   Subscribe to `checkout_completed` there and push the `purchase` event to
+   dataLayer / gtag / fbq from inside the pixel. Tracked as a launch blocker
+   in LAUNCH_BLOCKERS.md because it is Shopify admin work, not app code.
+
+   The `purchase` entry stays in the fbq event map below so the shared
+   trackEvent helper remains forward-compatible with the pixel's events.
+ */
 
 /* ==========================================================================
    Enhanced Conversions
@@ -235,15 +277,10 @@ export interface DataLayerItem {
  *
  * `currency` + `value` + `items` make the event measurable in GA4 reports and
  * usable as a Google Ads conversion action for target-ROAS bidding.
- *
- * `user_data` follows the Enhanced Conversions schema and is only attached at
- * the purchase step, where the shopper has actually supplied their details.
- * Never push personal data you do not have consent to process.
  */
 export function pushBeginCheckoutDataLayer(
   items: DataLayerItem[],
-  currency = 'USD',
-  coupon?: string
+  currency = 'USD'
 ): void {
   if (typeof window === 'undefined') return;
 
@@ -254,7 +291,6 @@ export function pushBeginCheckoutDataLayer(
     ecommerce: {
       currency,
       value: Number(value.toFixed(2)),
-      coupon,
       items: items.map((item) => ({
         item_id: item.item_id,
         item_name: item.item_name,
@@ -266,63 +302,4 @@ export function pushBeginCheckoutDataLayer(
   });
 
   console.debug('[Analytics] dataLayer begin_checkout pushed', { value, itemCount: items.length });
-}
-
-/**
- * Enhanced Conversions payload for the purchase/thank-you step, including the
- * `user_data` object Google matches against signed-in accounts. Call this from
- * your order-confirmation page with the customer attributes you collected.
- */
-export function pushPurchaseCompleteDataLayer(params: {
-  transactionId: string;
-  items: DataLayerItem[];
-  currency?: string;
-  shipping?: number;
-  tax?: number;
-  userData?: {
-    email?: string;
-    phoneNumber?: string;
-    address?: {
-      firstName?: string;
-      lastName?: string;
-      street?: string;
-      city?: string;
-      region?: string;
-      postalCode?: string;
-      country?: string;
-    };
-  };
-}): void {
-  if (typeof window === 'undefined') return;
-
-  const {
-    transactionId,
-    items,
-    currency = 'USD',
-    shipping = 0,
-    tax = 0,
-    userData,
-  } = params;
-
-  const value = items.reduce((sum, i) => sum + i.price * i.quantity, 0) + shipping + tax;
-
-  window.dataLayer.push({
-    event: 'purchase',
-    ecommerce: {
-      transaction_id: transactionId,
-      currency,
-      value: Number(value.toFixed(2)),
-      shipping,
-      tax,
-      items: items.map((item) => ({
-        item_id: item.item_id,
-        item_name: item.item_name,
-        price: item.price,
-        quantity: item.quantity,
-        item_category: 'Pet Ramp',
-      })),
-    },
-    // Enhanced Conversions — matched by Google against signed-in accounts
-    ...(userData ? { user_data: userData } : {}),
-  });
 }

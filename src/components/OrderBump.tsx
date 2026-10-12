@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatMoney } from '../lib/offers';
+import { formatMoney, money, ADDON_PRICES, ADDON_COMPARE_AT, PRODUCT_NAMES } from '../lib/offers';
 
 interface OrderBumpProps {
   /** Live mat variant ID from the Storefront API. */
@@ -20,14 +20,19 @@ interface OrderBumpProps {
  * Deliberately a *controlled* toggle: it does not write to the cart on click.
  * The buy handler performs one atomic cart write (ramp + mat together), which
  * avoids a race condition where a fast double-click creates duplicate lines.
+ *
+ * The "save $X" figure is computed from the real compare-at price
+ * (ADDON_COMPARE_AT) — never a hardcoded marketing number.
  */
 export const OrderBump: React.FC<OrderBumpProps> = ({
   matVariantId,
   enabled,
   onToggle,
-  price = 15,
+  price = ADDON_PRICES.tractionMat,
 }) => {
   const unavailable = !matVariantId;
+  const compareAt = ADDON_COMPARE_AT.tractionMat;
+  const savings = money(Math.max(0, compareAt - price));
 
   return (
     <div
@@ -49,14 +54,14 @@ export const OrderBump: React.FC<OrderBumpProps> = ({
           <span className="bg-gray-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             Add for ${formatMoney(price)}
           </span>
-          <span className="text-[0.8125rem] font-bold text-gray-900">
-            Heavy-Duty Traction Mat (2-Pack)
-          </span>
+          <span className="text-[0.8125rem] font-bold text-gray-900">{PRODUCT_NAMES.mat}</span>
         </div>
 
         <p className="mt-1 text-xs leading-relaxed text-gray-600">
           Locks the ramp to smooth garage floors and protects your bumper. One-time add-on,
-          normally $30 &mdash; <span className="font-bold text-gray-900">save $15</span> on this order.
+          normally ${formatMoney(compareAt)} &mdash;{' '}
+          {savings > 0 && <span className="font-bold text-gray-900">save ${formatMoney(savings)}</span>}
+          {savings > 0 ? ' on this order.' : ' included with this order.'}
         </p>
 
         {unavailable && (

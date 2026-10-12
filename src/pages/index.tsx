@@ -1,11 +1,10 @@
 import React, { Suspense, lazy } from 'react';
 import { Loader2 } from 'lucide-react';
-import { AdvertorialHeader } from '../components/AdvertorialHeader';
-import { UrgencyBar } from '../components/UrgencyBar';
+import { AnnouncementBar } from '../components/AnnouncementBar';
 import { StickyHeader } from '../components/StickyHeader';
 import { HeroSection } from '../components/HeroSection';
 import { BuyBox } from '../components/BuyBox';
-import { FeatureBento } from '../components/FeatureBento';
+import { Benefits } from '../components/Benefits';
 import { ComparisonTable } from '../components/ComparisonTable';
 import { SizeGuide } from '../components/SizeGuide';
 import { TrustBadges } from '../components/TrustBadges';
@@ -13,12 +12,17 @@ import { ShippingReturns } from '../components/ShippingReturns';
 import { Faq } from '../components/Faq';
 import { Footer } from '../components/Footer';
 import { StickyMobileBuyBar } from '../components/StickyMobileBuyBar';
+import { FounderNote } from '../components/FounderNote';
 import { PurchaseProvider } from '../lib/purchase-provider';
+import { GATES } from '../lib/assets';
+import { GUARANTEE_LABEL, WARRANTY_PRODUCT_LABEL } from '../lib/policy';
 
 /* --------------------------------------------------------------------------
    Core Web Vitals: defer below-the-fold sections.
    Video, UGC and reviews are not needed for first paint, so they are
    code-split and only fetched once they are likely to enter the viewport.
+   They are additionally gated (assets.ts) so a disabled section never even
+   downloads its chunk — see the asset-gate pattern documented there.
    -------------------------------------------------------------------------- */
 const VideoProof = lazy(() => import('../components/VideoProof').then((m) => ({ default: m.VideoProof })));
 const UGCGallery = lazy(() => import('../components/UGCGallery').then((m) => ({ default: m.UGCGallery })));
@@ -27,7 +31,7 @@ const Testimonials = lazy(() => import('../components/Testimonials').then((m) =>
 /** Placeholder shown while a deferred chunk loads. */
 const SectionFallback: React.FC<{ label: string }> = ({ label }) => (
   <div
-    className="flex items-center justify-center gap-2 rounded-3xl bg-stone-50 py-16 text-sm text-stone-400"
+    className="flex items-center justify-center gap-2 rounded-2xl bg-stone-50 py-16 text-sm text-stone-400"
     role="status"
     aria-live="polite"
   >
@@ -37,7 +41,13 @@ const SectionFallback: React.FC<{ label: string }> = ({ label }) => (
 );
 
 /**
- * Single-product landing page — 12-column split-screen direct response layout.
+ * Single-product landing page — 12-column split-screen layout.
+ *
+ * Mobile-first: one column from 390px, splitting into the editorial column
+ * (left) and a sticky purchase column (right) only at `lg`. Vertical rhythm
+ * is py-10 / sm:py-16; tap targets are min-h-12; there is no scroll-reveal
+ * animation (it hides content on slow devices and hurts Core Web Vitals);
+ * prefers-reduced-motion is respected globally in globals.css.
  *
  * Left  (7 cols): editorial content, natural scroll.
  * Right (5 cols): sticky purchase column, always in view while reading.
@@ -45,38 +55,43 @@ const SectionFallback: React.FC<{ label: string }> = ({ label }) => (
 const Page: React.FC = () => {
   return (
     <div className="min-h-screen bg-white text-stone-900 antialiased selection:bg-blue-200 selection:text-stone-900">
-      {/* Top assurance bar (compliance-safe: real stock only, no fake timers) */}
-      <UrgencyBar />
-
-      {/* Advertorial disclosure */}
-      <AdvertorialHeader />
+      {/* Static announcement bar — no coupon codes, no fake countdowns */}
+      <AnnouncementBar />
 
       {/* Glass header + mobile buy bar */}
       <StickyHeader />
 
-      <main className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-screen-lg px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           {/* ---------------- LEFT: editorial column (7) ---------------- */}
           <div className="space-y-16 lg:col-span-7">
             <HeroSection />
 
-            <Suspense fallback={<SectionFallback label="the demo video" />}>
-              <VideoProof />
-            </Suspense>
+            {GATES.videoProof && (
+              <Suspense fallback={<SectionFallback label="the demo video" />}>
+                <VideoProof />
+              </Suspense>
+            )}
 
-            <Suspense fallback={<SectionFallback label="owner videos" />}>
-              <UGCGallery />
-            </Suspense>
+            {GATES.ugcGallery && (
+              <Suspense fallback={<SectionFallback label="owner videos" />}>
+                <UGCGallery />
+              </Suspense>
+            )}
 
-            <FeatureBento />
+            <Benefits />
 
             <ComparisonTable />
 
             <SizeGuide />
 
-            <Suspense fallback={<SectionFallback label="reviews" />}>
-              <Testimonials />
-            </Suspense>
+            {GATES.testimonials && (
+              <Suspense fallback={<SectionFallback label="reviews" />}>
+                <Testimonials />
+              </Suspense>
+            )}
+
+            <FounderNote />
 
             <TrustBadges />
 
@@ -96,8 +111,7 @@ const Page: React.FC = () => {
               </div>
 
               <p className="mt-4 text-center text-xs text-stone-500">
-                Free insured shipping &middot; 30-day money-back guarantee &middot;
-                Lifetime hardware warranty
+                Free insured shipping &middot; {GUARANTEE_LABEL} &middot; {WARRANTY_PRODUCT_LABEL}
               </p>
             </div>
           </aside>

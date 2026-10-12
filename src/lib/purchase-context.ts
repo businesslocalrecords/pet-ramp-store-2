@@ -1,14 +1,22 @@
 import { createContext, useContext } from 'react';
 import type { Variant } from './shopify';
-import type { OfferTier } from './offers';
+import type { OfferTier, RampSize } from './offers';
 
 export type { Variant };
 
 export interface PurchaseContextValue {
-  /** Currently selected tier. */
+  /** Currently selected bundle tier. */
   tier: OfferTier;
   selectedId: string;
   selectTier: (id: string) => void;
+  /** Currently selected ramp size (Compact / Extended). */
+  rampSize: RampSize;
+  /** Selects a size; resolves the matching Shopify variant. */
+  setRampSize: (id: string) => void;
+  /** Ramp line price for the selected tier + size (excludes add-ons). */
+  rampPrice: number;
+  /** The Shopify variant that fulfils the selected size, once loaded. */
+  rampVariant: Variant | null;
   /** Order bump state (traction mat). */
   bumpEnabled: boolean;
   setBumpEnabled: (next: boolean) => void;

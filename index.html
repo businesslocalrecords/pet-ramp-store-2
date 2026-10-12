@@ -22,56 +22,66 @@
     />
 
     <!-- Core Web Vitals: prioritize the LCP hero image -->
-    <link rel="preload" as="image" href="/assets/hero-ramp.svg" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/product/ramp-compact.svg" fetchpriority="high" />
 
     <!-- Primary SEO -->
-    <title>PawGrip Pro — The Dog Car Ramp for Senior & Large Dogs | 250 lb Capacity</title>
+    <title>PawGrip Pro — The Foldable Dog Car Ramp for Senior &amp; Large Dogs | 150–250 lb Rated</title>
     <meta
       name="description"
-      content="Protect your dog's joints and your back. The PawGrip Pro telescoping dog car ramp holds up to 250 lbs, fits any vehicle, and folds flat. Free shipping and a 30-day money-back guarantee."
+      content="Protect your dog's joints and your back. The PawGrip Pro telescoping dog car ramp is rated to 150 lb (Compact) or 250 lb (Extended), folds flat, and ships free with a 30-day money-back guarantee."
     />
     <meta
       name="keywords"
-      content="dog car ramp, foldable dog ramp, pet ramp for SUV, dog ramp for large dogs, senior dog ramp, arthritis dog ramp, telescoping dog ramp"
+      content="dog car ramp, foldable dog ramp, pet ramp for SUV, dog ramp for large dogs, senior dog ramp, telescoping dog ramp"
     />
     <link rel="canonical" href="https://pawgrippro.com/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="product" />
     <meta property="og:site_name" content="PawGrip Pro" />
-    <meta property="og:title" content="PawGrip Pro — The Dog Car Ramp for Senior & Large Dogs" />
+    <meta property="og:title" content="PawGrip Pro — The Foldable Dog Car Ramp for Senior &amp; Large Dogs" />
     <meta
       property="og:description"
-      content="250 lb capacity, vet-approved gentle slope, folds flat in seconds. Free insured shipping and a 30-day money-back guarantee on every order."
+      content="Rated to 150 lb (Compact) or 250 lb (Extended), folds flat in seconds. Free insured shipping and a 30-day money-back guarantee on every order."
     />
-    <meta property="og:image" content="https://pawgrippro.com/assets/hero-ramp.svg" />
+    <meta property="og:image" content="https://pawgrippro.com/assets/product/ramp-compact.svg" />
     <meta property="og:url" content="https://pawgrippro.com/" />
-    <meta property="product:price:amount" content="149" />
+    <meta property="product:price:amount" content="79.99" />
     <meta property="product:price:currency" content="USD" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PawGrip Pro — The Dog Car Ramp for Senior & Large Dogs" />
+    <meta name="twitter:title" content="PawGrip Pro — The Foldable Dog Car Ramp for Senior &amp; Large Dogs" />
     <meta
       name="twitter:description"
-      content="250 lb capacity, vet-approved gentle slope, folds flat in seconds. Free shipping and a 30-day money-back guarantee."
+      content="Rated to 150 lb (Compact) or 250 lb (Extended), folds flat in seconds. Free insured shipping and a 30-day money-back guarantee."
     />
-    <meta name="twitter:image" content="https://pawgrippro.com/assets/hero-ramp.svg" />
+    <meta name="twitter:image" content="https://pawgrippro.com/assets/product/ramp-compact.svg" />
 
-    <!-- Product structured data -->
+    <!--
+      Product structured data.
+
+      V3 fixes — the previous markup hardcoded price "149", a fabricated
+      4.9 / 2,847-review aggregateRating, "vet-approved" and "fits any
+      vehicle". Aggregate ratings must come from a real review source (none
+      exists yet — see LAUNCH_BLOCKERS.md), so it is removed rather than
+      faked; Google Merchant Center and rich-result policy both reject
+      invented review markup. The price matches the default tier in
+      src/lib/offers.ts ($79.99, 1 ramp).
+    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Product",
-        "name": "PawGrip Pro Dog Car Ramp",
-        "image": "https://pawgrippro.com/assets/hero-ramp.svg",
-        "description": "Telescoping dog car ramp with a vet-approved gentle slope, rated to 250 lbs. Folds flat for storage in any vehicle. Free insured shipping and a 30-day money-back guarantee.",
+        "name": "PawGrip Pro Foldable Dog Car Ramp",
+        "image": "https://pawgrippro.com/assets/product/ramp-compact.svg",
+        "description": "Telescoping foldable dog car ramp rated to 150 lb (Compact) or 250 lb (Extended), with a textured traction deck and side rails. Folds flat for storage. Free insured shipping and a 30-day money-back guarantee.",
         "brand": { "@type": "Brand", "name": "PawGrip Pro" },
         "offers": {
           "@type": "Offer",
           "url": "https://pawgrippro.com/",
           "priceCurrency": "USD",
-          "price": "149",
+          "price": "79.99",
           "availability": "https://schema.org/InStock",
           "shippingDetails": {
             "@type": "OfferShippingDetails",
@@ -82,14 +92,27 @@
             "merchantReturnDays": 30,
             "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow"
           }
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.9",
-          "reviewCount": "2847"
         }
       }
     </script>
+
+    <!--
+      Netlify Forms detection.
+
+      Netlify only recognizes forms that exist in the HTML it deploys. The
+      React app renders its forms client-side, so these hidden shells register
+      the "contact" and "founding-tester" form names for JS-injected forms.
+      The static pages in public/ (contact, guide) render real <form> markup
+      that Netlify detects directly.
+    -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="text" name="bot-field" />
+      <input type="hidden" name="form-name" value="contact" />
+    </form>
+    <form name="founding-tester" netlify netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="text" name="bot-field" />
+      <input type="hidden" name="form-name" value="founding-tester" />
+    </form>
   </head>
   <body>
     <div id="root"></div>

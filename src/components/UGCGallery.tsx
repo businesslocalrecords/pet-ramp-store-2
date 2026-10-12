@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Play, VolumeX, Camera, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GATES } from '../lib/assets';
 
 /**
  * One slot in the carousel.
@@ -10,6 +11,8 @@ import { Play, VolumeX, Camera, ChevronLeft, ChevronRight } from 'lucide-react';
  * below with genuine customer content before running paid traffic.
  * Fabricated usernames or scripted "reviews" would violate ad-network
  * policy and are intentionally not included.
+ *
+ * GATED: renders nothing until GATES.ugcGallery is enabled.
  */
 interface UgcClip {
   id: string;
@@ -74,6 +77,9 @@ export const UGCGallery: React.FC = () => {
     if (!el) return;
     el.scrollBy({ left: direction * (el.clientWidth * 0.8), behavior: 'smooth' });
   };
+
+  // Gate after the hooks so hook order is stable across renders.
+  if (!GATES.ugcGallery) return null;
 
   return (
     <section id="ugc" className="scroll-mt-24">

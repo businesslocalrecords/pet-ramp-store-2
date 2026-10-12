@@ -1,55 +1,73 @@
 import React, { useState } from 'react';
 import { ChevronDown, MessageCircleQuestion } from 'lucide-react';
+import { RAMP_SIZES, COMPACT_MAX_HEIGHT_IN } from '../lib/offers';
+import { POLICY } from '../lib/policy';
+import { trackFaqOpen } from '../lib/analytics';
 
 interface Faq {
   q: string;
   a: string;
 }
 
+const compact = RAMP_SIZES[0];
+const extended = RAMP_SIZES[1];
+
+/**
+ * FAQ answers are written from the store's published specifications and
+ * policy values only. The old answers contained invented statistics ("94% of
+ * customers…", "static-tested beyond 500 lbs") and implied veterinary
+ * endorsement. Where a question is genuinely a veterinary question, the
+ * answer says so instead of answering it.
+ */
 const faqs: Faq[] = [
   {
     q: 'Will my dog actually use it?',
-    a: 'Yes — 94% of customers report their dog walking up the ramp unassisted within the first 24 hours. The key is the shallow 24–28° slope and the high-traction surface that gives dogs confident footing. Start slow: let your dog sniff the ramp, place treats along it, and praise each step. Most dogs need only two or three sessions.',
+    a: 'Many dogs walk up a ramp within a few short sessions, and the design gives them every reason to: a gentle slope, a textured deck that grips nails, and side rails so they cannot slip off the edge. Start slow — let your dog sniff the ramp, place treats along it, and praise each step. Two or three short sessions is typical; some cautious dogs need longer, which is what the trial period is for.',
   },
   {
     q: 'How do I know which size fits my vehicle?',
-    a: 'Measure from the ground to your bumper or cargo floor. Under 30" — the Compact (62" ramp) is ideal for sedans, hatchbacks, and compact SUVs. Over 30" or lifted trucks — choose the Extended (70" ramp). Still unsure? Email us a photo of your vehicle and we will size it for you free of charge.',
+    a: `Use the size finder above: measure from the ground to your bumper or cargo floor and it computes the slope for each size. As a rule of thumb, up to about ${COMPACT_MAX_HEIGHT_IN}″ the Compact (${compact.lengthIn}″) is the right call; above that — or for lifted trucks — the Extended (${extended.lengthIn}″) keeps the slope gentler. Still unsure? Send us a photo of your vehicle and we will size it for you.`,
   },
   {
-    q: 'Is the ramp safe for senior dogs or dogs with arthritis?',
-    a: 'Absolutely — it was designed for them. Veterinarians recommend ramps over jumping precisely because jumping loads the joints with 3–4× a dog\'s body weight on impact. Our gentle slope eliminates that impact entirely. The PawGrip Pro is used by thousands of owners of senior dogs with hip dysplasia and arthritis.',
+    q: 'Is the ramp suitable for senior dogs?',
+    a: 'A ramp replaces a jump with a walk, which is why owners of senior and large dogs ask for one. Whether a ramp is right for your dog’s specific condition is a question for your veterinarian — we make no medical claims about the product.',
   },
   {
     q: 'How much weight can it hold?',
-    a: 'The Compact is rated to 150 lbs and the Extended to 250 lbs. Both are tested with a 2× safety margin, so an Extended ramp has been static-tested beyond 500 lbs without structural flex. The aircraft-grade aluminum frame will not bow under load.',
+    a: `The published rating is ${compact.weightCapacityLb} lb for the Compact and ${extended.weightCapacityLb} lb for the Extended. Choose the size whose rating sits comfortably above your dog’s weight.`,
   },
   {
     q: 'Will it slip on wet pavement or in my garage?',
-    a: 'No. The ramp feet have rubberized non-slip grips, and the walking surface is a sandpaper-textured fiberglass composite. Our free non-slip locking mat (in the bundle) adds another layer of security against a smooth garage floor or bumper.',
+    a: `The feet are rubberized for grip and the walking surface is textured. On a smooth garage floor or bumper, add the traction mat — it locks the ramp feet down and stops bumper scuffing.`,
   },
   {
-    q: 'How does the 30-day guarantee work?',
-    a: 'Order today and put the ramp in your car. If your dog does not take to it, if the size is wrong, or if you simply change your mind within 30 days, email us and we will send a prepaid return label. You get a full refund — no restocking fee, no questions, no hard feelings.',
+    q: 'How does the money-back guarantee work?',
+    a: `If your dog does not take to it, the size is wrong, or you simply change your mind, email us within ${POLICY.returnDays} days of delivery and we will send a prepaid return label. You get a full refund — no restocking fee.`,
   },
   {
-    q: 'How fast is shipping and where do you ship from?',
-    a: 'Orders placed before 2pm ship the same business day from our domestic warehouse, with insured express delivery in 2–5 business days across the continental US. You will receive a tracking link by email as soon as your order leaves.',
+    q: 'How fast is shipping, and where do you ship?',
+    a: `We ship to the continental United States. Orders placed before ${POLICY.shippingCutoff} on a business day leave the same business day, with insured delivery in ${POLICY.deliveryWindow}. You will receive a tracking link by email as soon as your order leaves.`,
   },
   {
     q: 'Can it be used for trucks with a lift kit?',
-    a: 'Yes — that is exactly what the Extended (70") is built for. It reaches the cargo height of most lifted trucks. For extreme lift kits over 40", contact us and we will advise whether you need our custom-extension accessory.',
+    a: `That is what the Extended (${extended.lengthIn}″) is built for — it reaches the cargo height of most lifted trucks. For very tall setups, contact us first and we will tell you honestly whether a ramp can reach your height.`,
   },
   {
     q: 'Is assembly required?',
-    a: 'None. The PawGrip Pro arrives fully assembled. Unfold it, set the feet, and it is ready to use. It telescopes to length in seconds and folds back down to 31–35" for storage in your trunk or garage.',
+    a: `The ramp telescopes open and folds flat, and ships with a quick-start fit card for your vehicle height. It folds to ${compact.foldedIn}″ (Compact) or ${extended.foldedIn}″ (Extended) for storage in your trunk or garage.`,
   },
 ];
 
 export const Faq: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+  const toggle = (idx: number, question: string) => {
+    if (openIndex !== idx) trackFaqOpen(question);
+    setOpenIndex(openIndex === idx ? null : idx);
+  };
+
   return (
-    <section id="faq" className="py-20 lg:py-24 px-4 sm:px-6 bg-stone-50 text-stone-900 scroll-mt-16">
+    <section id="faq" className="scroll-mt-24 py-12 sm:py-16">
       {/* JSON-LD structured data for SEO */}
       <script
         type="application/ld+json"
@@ -66,13 +84,13 @@ export const Faq: React.FC = () => {
         }}
       />
 
-      <div className="max-w-3xl mx-auto">
+      <div className="mx-auto max-w-3xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-100 text-amber-800">
-            <MessageCircleQuestion className="w-3.5 h-3.5" /> Questions & Answers
+        <div className="mb-10 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest text-amber-800">
+            <MessageCircleQuestion className="h-3.5 w-3.5" aria-hidden="true" /> Questions &amp; Answers
           </span>
-          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
             Everything You Are Wondering
           </h2>
         </div>
@@ -84,31 +102,31 @@ export const Faq: React.FC = () => {
             return (
               <div
                 key={idx}
-                className={`rounded-2xl border-2 transition-all duration-300 overflow-hidden ${
-                  isOpen ? 'border-stone-900 bg-white shadow-md' : 'border-stone-200 bg-white hover:border-stone-300'
+                className={`overflow-hidden rounded-2xl border-2 transition-colors duration-200 ${
+                  isOpen ? 'border-stone-900 bg-white' : 'border-stone-200 bg-white hover:border-stone-300'
                 }`}
               >
                 <button
-                  onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+                  onClick={() => toggle(idx, faq.q)}
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                   aria-expanded={isOpen}
                 >
-                  <span className="font-bold text-base leading-snug">{faq.q}</span>
+                  <span className="font-bold leading-snug">{faq.q}</span>
                   <span
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                      isOpen ? 'bg-stone-900 text-white rotate-180' : 'bg-stone-100 text-stone-600'
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                      isOpen ? 'rotate-180 bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'
                     }`}
                   >
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDown className="h-5 w-5" aria-hidden="true" />
                   </span>
                 </button>
                 <div
-                  className={`grid transition-all duration-300 ease-in-out ${
+                  className={`grid transition-all duration-200 ease-in-out ${
                     isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-6 pb-5 text-stone-600 leading-relaxed">{faq.a}</p>
+                    <p className="px-6 pb-5 leading-relaxed text-stone-600">{faq.a}</p>
                   </div>
                 </div>
               </div>
@@ -116,18 +134,24 @@ export const Faq: React.FC = () => {
           })}
         </div>
 
-        {/* Still have questions */}
-        <div className="mt-10 text-center p-7 rounded-3xl bg-stone-900 text-stone-100">
-          <h3 className="font-bold text-lg">Still have a question?</h3>
-          <p className="mt-1 text-sm text-stone-400">
-            Our team replies within 2 hours, 7 days a week.
-          </p>
-          <a
-            href="mailto:support@pawgrippro.com"
-            className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-stone-900 rounded-xl font-bold transition-colors"
-          >
-            Email Support
-          </a>
+        {/* Still have questions — routes to the contact page's Netlify form */}
+        <div className="mt-10 rounded-2xl bg-stone-900 p-7 text-center text-stone-100">
+          <h3 className="text-lg font-bold">Still have a question?</h3>
+          <p className="mt-1 text-sm text-stone-400">Our team replies {POLICY.supportReply}.</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <a
+              href="/contact/"
+              className="inline-flex min-h-12 items-center gap-2 rounded-md bg-amber-500 px-6 py-3 font-bold text-stone-900 transition-colors hover:bg-amber-400"
+            >
+              Contact us
+            </a>
+            <a
+              href={`mailto:support@pawgrippro.com`}
+              className="inline-flex min-h-12 items-center gap-2 rounded-md border border-stone-700 px-6 py-3 font-bold text-stone-200 transition-colors hover:bg-stone-800"
+            >
+              Email support
+            </a>
+          </div>
         </div>
       </div>
     </section>

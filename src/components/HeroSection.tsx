@@ -1,39 +1,48 @@
 import React, { useState } from 'react';
-import { Star, ThumbsUp, Truck, RefreshCw, ShieldCheck } from 'lucide-react';
-import { AuthorByline } from './AuthorByline';
+import { Truck, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Byline } from './Byline';
 import { readDkiParams } from '../lib/dki';
+import { ASSETS } from '../lib/assets';
+import { POLICY, RETURN_WINDOW_LABEL, WARRANTY_LABEL } from '../lib/policy';
 
-/** Gallery frames. Replace these with real product photography when shot. */
-const GALLERY = [
+interface GalleryFrame {
+  src: string;
+  alt: string;
+  label: string;
+}
+
+/**
+ * Gallery frames.
+ *
+ * The storefront ships with the original SVG renderings from
+ * public/assets/product/ (white background — Merchant Center friendly).
+ * When the owner drops real photography into ASSETS.heroPhotos it takes
+ * precedence automatically; the renderings stay as the fallback.
+ */
+const RENDERING_FRAMES: GalleryFrame[] = [
   {
-    src: '/assets/hero-ramp.svg',
-    alt: 'Dog walking up the PawGrip Pro telescoping ramp into an SUV',
-    label: 'In use',
+    src: ASSETS.product.standard,
+    alt: 'Compact 62-inch configuration of the PawGrip Pro foldable dog car ramp, side view',
+    label: 'Compact \u00b7 62\u2033',
   },
   {
-    src: '/assets/hero-ramp.svg',
-    alt: 'Close-up of the high-traction ramp surface',
-    label: 'Surface detail',
-  },
-  {
-    src: '/assets/hero-ramp.svg',
-    alt: 'Ramp folded flat for trunk storage',
-    label: 'Folded 31"',
-  },
-  {
-    src: '/assets/hero-ramp.svg',
-    alt: 'Non-slip locking mat accessory',
-    label: 'Bundled mat',
+    src: ASSETS.product.extended,
+    alt: 'Extended 70-inch configuration of the PawGrip Pro foldable dog car ramp, side view',
+    label: 'Extended \u00b7 70\u2033',
   },
 ];
 
-const RATING = 4.9;
-const REVIEW_COUNT = 2847;
-
 /**
- * Hero editorial block: advertorial byline, DKI headline, and a
- * strict-aspect-ratio image gallery. The purchase UI lives in the
- * sticky right-hand column (see BuyBox).
+ * Hero editorial block: honest byline, DKI headline (whitelisted values
+ * only — see lib/dki.ts), and a product gallery.
+ *
+ * REMOVED IN V3 (were fabricated and violated ad-network policy):
+ *   - the 4.9 / 2,847-review star row and "96% would buy again" stat
+ *   - the "24–28° joint-safe slope" vet-style claim. The slope is now shown
+ *     honestly and computed live: about 20–25° at typical SUV heights,
+ *     derived in lib/offers.ts (slopeDeg) and surfaced in the SizeGuide.
+ *
+ * The purchase UI lives in the sticky right-hand column (see BuyBox).
  */
 export const HeroSection: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -41,14 +50,20 @@ export const HeroSection: React.FC = () => {
   // mismatch to guard against.
   const [dki] = useState(() => readDkiParams());
 
-  const active = GALLERY[activeIndex];
+  const ownerFrames: GalleryFrame[] = ASSETS.heroPhotos.map((src, i) => ({
+    src,
+    alt: `PawGrip Pro owner photo ${i + 1}`,
+    label: 'Owner photo',
+  }));
+  const frames: GalleryFrame[] = [...RENDERING_FRAMES, ...ownerFrames];
+  const active = frames[Math.min(activeIndex, frames.length - 1)];
 
   return (
     <section id="hero" className="scroll-mt-24">
       {/* Editorial byline */}
-      <AuthorByline />
+      <Byline />
 
-      {/* DKI headline */}
+      {/* DKI headline — values are whitelisted, never raw URL input */}
       <h1 className="mt-5 text-[2rem] leading-[1.08] font-extrabold text-stone-900 sm:text-[2.6rem] lg:text-[3rem]">
         The <span className="text-blue-700">{dki.vehiclePhrase}</span>
         <br />
@@ -56,45 +71,24 @@ export const HeroSection: React.FC = () => {
       </h1>
 
       <p className="mt-4 max-w-xl text-[1.0625rem] text-stone-600">
-        Stop lifting a 90 lb dog into your {dki.vehicleInline}. The PawGrip Pro gives
-        dogs up to 250 lbs a 24&ndash;28&deg; joint-safe slope they walk up on their own{' '}
-        {dki.locationInline} &mdash; in seconds, with no jumping and no strain on your
-        back. {dki.breedPhrase.charAt(0).toUpperCase() + dki.breedPhrase.slice(1)}.
+        Stop lifting a 90 lb dog into your {dki.vehicleInline}. The PawGrip Pro turns
+        the jump into a walk up a gentle slope &mdash; about 20&ndash;25&deg; at typical
+        SUV heights &mdash; with a high-traction deck and side rails so nervous dogs
+        step in on their own {dki.locationInline}.{' '}
+        {dki.breedPhrase.charAt(0).toUpperCase() + dki.breedPhrase.slice(1)}.
       </p>
-
-      {/* Rating row */}
-      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-0.5" aria-hidden="true">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star
-                key={i}
-                className={`h-[18px] w-[18px] ${
-                  i <= Math.round(RATING) ? 'fill-amber-400 text-amber-400' : 'fill-stone-200 text-stone-200'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-sm font-bold text-stone-900">{RATING}</span>
-          <span className="text-sm text-stone-500">({REVIEW_COUNT.toLocaleString()} reviews)</span>
-        </div>
-        <span className="flex items-center gap-1.5 text-sm font-medium text-stone-600">
-          <ThumbsUp className="h-4 w-4 text-blue-600" aria-hidden="true" />
-          96% would buy again
-        </span>
-      </div>
 
       {/* Gallery */}
       <div className="mt-7">
-        {/* Main frame — strict mathematical aspect ratio */}
-        <div className="relative overflow-hidden rounded-3xl bg-stone-100 ring-1 ring-stone-900/5">
-          <div className="aspect-[4/5] md:aspect-square">
+        {/* Main frame */}
+        <div className="relative overflow-hidden rounded-2xl bg-white ring-1 ring-stone-900/10">
+          <div className="aspect-[3/2]">
             <img
               key={active.src}
               src={active.src}
               alt={active.alt}
               width={1200}
-              height={900}
+              height={800}
               loading="eager"
               fetchPriority="high"
               decoding="async"
@@ -103,37 +97,42 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Frame label */}
-          <span className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-stone-700 backdrop-blur-md ring-1 ring-stone-900/5">
+          <span className="absolute left-4 top-4 rounded-full bg-white/85 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-stone-700 ring-1 ring-stone-900/10">
             {active.label}
           </span>
 
-          {/* In-image assurance strip */}
+          {/* In-image assurance strip — all values from lib/policy.ts */}
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-5 bg-gradient-to-t from-stone-900/70 to-transparent px-4 py-3.5 text-[11px] font-semibold text-white">
             <span className="flex items-center gap-1.5">
-              <Truck className="h-3.5 w-3.5" aria-hidden="true" /> Ships in 24h
+              <Truck className="h-3.5 w-3.5" aria-hidden="true" /> Ships within{' '}
+              {POLICY.shipsWithinBusinessDays} business day
             </span>
             <span className="flex items-center gap-1.5">
-              <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> 30-day returns
+              <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> {RETURN_WINDOW_LABEL}{' '}
+              returns
             </span>
             <span className="hidden items-center gap-1.5 sm:flex">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> 1-yr warranty
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> {WARRANTY_LABEL}{' '}
+              warranty
             </span>
           </div>
         </div>
 
         {/* Thumbnails */}
-        <div className="hide-scrollbar mt-3 flex gap-3 overflow-x-auto pb-1" role="tablist" aria-label="Product images">
-          {GALLERY.map((frame, idx) => (
+        <div
+          className="hide-scrollbar mt-3 flex gap-3 overflow-x-auto pb-1"
+          role="tablist"
+          aria-label="Product images"
+        >
+          {frames.map((frame, idx) => (
             <button
-              key={idx}
+              key={frame.src + idx}
               role="tab"
               aria-selected={idx === activeIndex}
               aria-label={frame.alt}
               onClick={() => setActiveIndex(idx)}
-              className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl ring-1 transition-all duration-200 hover:-translate-y-0.5 ${
-                idx === activeIndex
-                  ? 'ring-2 ring-blue-600'
-                  : 'ring-stone-900/10 hover:ring-stone-900/20'
+              className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl ring-1 transition-all duration-200 ${
+                idx === activeIndex ? 'ring-2 ring-blue-600' : 'ring-stone-900/10 hover:ring-stone-900/20'
               }`}
             >
               <img
@@ -143,7 +142,7 @@ export const HeroSection: React.FC = () => {
                 height={160}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover"
+                className="h-full w-full bg-white object-cover"
               />
             </button>
           ))}

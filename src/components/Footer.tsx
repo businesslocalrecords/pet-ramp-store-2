@@ -1,34 +1,7 @@
 import React from 'react';
-import { PawPrint, Mail, Phone, MapPin, Camera, Globe, Play, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
-
-/**
- * ---------------------------------------------------------------------------
- * REPLACE THESE BEFORE RUNNING PAID TRAFFIC
- * ---------------------------------------------------------------------------
- * Google Merchant Center / PMax requires a real, verifiable business identity
- * on the landing page. These are deliberately OBVIOUS placeholders: a fake
- * address is worse than a missing one, and the banner below will keep showing
- * until every field is filled in with real values.
- */
-const BUSINESS = {
-  legalName: 'PawGrip Pro',
-  addressLine1: 'REPLACE_WITH_STREET_ADDRESS',
-  addressLine2: 'REPLACE_WITH_SUITE_OR_UNIT',
-  city: 'REPLACE_WITH_CITY',
-  state: 'REPLACE_WITH_STATE',
-  postalCode: 'REPLACE_WITH_ZIP',
-  country: 'United States',
-  email: 'support@pawgrippro.com',
-  phone: 'REPLACE_WITH_PHONE_NUMBER',
-};
-
-/** True while any required field is still an unfilled placeholder. */
-const IS_INCOMPLETE =
-  BUSINESS.addressLine1.startsWith('REPLACE_') ||
-  BUSINESS.city.startsWith('REPLACE_') ||
-  BUSINESS.state.startsWith('REPLACE_') ||
-  BUSINESS.postalCode.startsWith('REPLACE_') ||
-  BUSINESS.phone.startsWith('REPLACE_');
+import { PawPrint, Mail, Phone, MapPin, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
+import { BUSINESS, BUSINESS_IS_INCOMPLETE, REQUIRE_BUSINESS_INFO } from '../lib/assets';
+import { POLICY } from '../lib/policy';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -36,42 +9,62 @@ const linkGroups = [
   {
     title: 'Product',
     links: [
-      { label: 'Features', href: '#features' },
-      { label: 'Compare', href: '#compare' },
-      { label: 'Owner Videos', href: '#ugc' },
-      { label: 'Reviews', href: '#reviews' },
+      { label: 'Benefits', href: '#benefits' },
+      { label: 'Compare options', href: '#compare' },
+      { label: 'Size finder', href: '#size-guide' },
       { label: 'FAQ', href: '#faq' },
     ],
   },
   {
     title: 'Support',
     links: [
-      { label: 'Shipping & Returns', href: '#shipping' },
-      { label: 'Track My Order', href: '#' },
-      { label: 'Contact Us', href: `mailto:${BUSINESS.email}` },
+      { label: 'Shipping policy', href: '/shipping/' },
+      { label: 'Returns policy', href: '/returns/' },
+      { label: 'Warranty', href: '/warranty/' },
+      { label: 'Contact us', href: '/contact/' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'Warranty', href: '#shipping' },
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
-      { label: 'Refund Policy', href: '#shipping' },
+      { label: 'About', href: '/about/' },
+      { label: 'How to choose a dog car ramp', href: '/guide/how-to-choose-a-dog-car-ramp/' },
+      { label: 'Privacy policy', href: '/privacy/' },
+      { label: 'Terms of service', href: '/terms/' },
     ],
   },
 ];
 
+/**
+ * Site footer.
+ *
+ * Business identity lives in src/lib/assets.ts (single source, shared with
+ * the Footer's launch guard). V3 removed two fabricated claims that used to
+ * live here: "Join 12,000+ owners" (an invented customer count) and the
+ * "Lifetime hardware warranty" (the real warranty is POLICY.warrantyMonths).
+ *
+ * The dead social-icon row was removed until real profiles exist.
+ */
 export const Footer: React.FC = () => {
+  // Launch guard: when the owner opts in via VITE_REQUIRE_BUSINESS_INFO, a
+  // missing business identity is a hard failure rather than a silent one.
+  // (vite.config.ts already failed the build in that state; this catches a
+  // runtime deploy of stale env values.)
+  if (REQUIRE_BUSINESS_INFO && BUSINESS_IS_INCOMPLETE) {
+    throw new Error(
+      'VITE_REQUIRE_BUSINESS_INFO is set but BUSINESS in src/lib/assets.ts still contains placeholders. ' +
+        'Fill in the real address and phone, or unset the flag.'
+    );
+  }
+
   return (
     <footer className="bg-stone-950 text-stone-400">
       {/* Dev warning while business details are placeholders */}
-      {IS_INCOMPLETE && (
+      {BUSINESS_IS_INCOMPLETE && (
         <div className="border-b border-amber-500/30 bg-amber-950/40 px-4 py-2.5 text-center text-[11px] font-medium text-amber-300">
           Developer notice: business address and phone are still placeholders.
           Replace the <code className="font-mono">BUSINESS</code> object in{' '}
-          <code className="font-mono">src/components/Footer.tsx</code> before
-          running Google Ads / PMax.
+          <code className="font-mono">src/lib/assets.ts</code> before running Google Ads / PMax.
         </div>
       )}
 
@@ -79,15 +72,14 @@ export const Footer: React.FC = () => {
       <div className="border-b border-stone-800">
         <div className="mx-auto max-w-4xl px-4 py-14 text-center sm:px-6">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Give Your Dog a Pain-Free Ride
+            Give Your Dog an Easier Ride
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-stone-400">
-            Join 12,000+ owners who stopped lifting their dogs into the car.
-            30-day risk-free trial, free shipping, free returns.
+            {POLICY.returnDays}-day risk-free trial, free insured shipping, free returns.
           </p>
           <a
             href="#offer"
-            className="mt-7 inline-flex items-center gap-2 rounded-md bg-[#F37021] px-9 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-[#D95E1A]"
+            className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-md bg-[#F37021] px-9 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-[#D95E1A]"
           >
             Get the PawGrip Pro
           </a>
@@ -140,24 +132,13 @@ export const Footer: React.FC = () => {
                 <Truck className="h-4 w-4 text-amber-500" aria-hidden="true" /> Free insured shipping
               </span>
               <span className="flex items-center gap-1.5">
-                <RotateCcw className="h-4 w-4 text-amber-500" aria-hidden="true" /> 30-day returns
+                <RotateCcw className="h-4 w-4 text-amber-500" aria-hidden="true" /> {POLICY.returnDays}-day
+                returns
               </span>
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-amber-500" aria-hidden="true" /> 1-year warranty
+                <ShieldCheck className="h-4 w-4 text-amber-500" aria-hidden="true" /> {POLICY.warrantyMonths}
+                -month warranty
               </span>
-            </div>
-
-            <div className="mt-6 flex items-center gap-3">
-              {[Camera, Globe, Play].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Social profile"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-stone-900 transition-colors hover:bg-amber-500 hover:text-stone-900"
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </a>
-              ))}
             </div>
           </div>
 

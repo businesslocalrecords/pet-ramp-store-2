@@ -1,5 +1,6 @@
 import React from 'react';
-import { PackageCheck, Truck, RotateCcw, ShieldCheck, Clock, MapPin } from 'lucide-react';
+import { PackageCheck, Truck, Clock, RotateCcw, ShieldCheck, MapPin } from 'lucide-react';
+import { POLICY } from '../lib/policy';
 
 interface Step {
   num: string;
@@ -12,99 +13,113 @@ const steps: Step[] = [
   {
     num: '1',
     title: 'Order in 60 Seconds',
-    desc: 'Choose your size, check out securely with Shop Pay, Apple Pay, or card. Orders before 2pm ship the same business day.',
+    desc: `Choose your size, check out securely with Shop Pay, Apple Pay, or card. Orders before ${POLICY.shippingCutoff} on a business day ship the same day.`,
     icon: PackageCheck,
   },
   {
     num: '2',
-    title: 'Arrives in 2–5 Days',
+    title: `Arrives in ${POLICY.deliveryWindow}`,
     desc: 'Insured express delivery from our domestic warehouse, fully tracked. Free on every order — no minimum.',
     icon: Truck,
   },
   {
     num: '3',
     title: 'Try It Risk-Free',
-    desc: 'Give your dog up to 30 days to get comfortable. Watch them walk up unassisted — most dogs adapt in a day.',
+    desc: `Give your dog up to ${POLICY.returnDays} days to get comfortable. Watch them walk up on their own — most dogs take a few short sessions.`,
     icon: Clock,
   },
   {
     num: '4',
     title: 'Love It or Return It',
-    desc: 'Not the right fit? Email us for a prepaid return label and a full refund within 5 business days. No restocking fee.',
+    desc: 'Not the right fit? Email us for a prepaid return label and a full refund once the ramp reaches the warehouse. No restocking fee.',
     icon: RotateCcw,
   },
 ];
 
+/**
+ * Shipping & returns section. Every number is sourced from lib/policy.ts —
+ * the previous version hardcoded "2–5 days", "30 days" and a 1-year
+ * warranty in prose, and promised Canada/UK shipping the store has not
+ * set up. Full details live on the /shipping/, /returns/ and /warranty/
+ * policy pages.
+ */
 export const ShippingReturns: React.FC = () => {
   return (
-    <section id="shipping" className="py-20 lg:py-24 px-4 sm:px-6 bg-white text-stone-900 scroll-mt-16">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-100 text-amber-800">
-            <ShieldCheck className="w-3.5 h-3.5" /> Service Promise
-          </span>
-          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
-            Shipping & Returns, Completely Sorted
-          </h2>
-          <p className="mt-4 text-stone-600 text-lg">
-            Fast, free, insured — and a guarantee with zero fine print.
+    <section id="shipping" className="scroll-mt-24 py-12 sm:py-16">
+      <div className="mb-10 text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest text-amber-800">
+          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Service promise
+        </span>
+        <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Shipping &amp; Returns, Completely Sorted
+        </h2>
+        <p className="mt-3 text-stone-600">
+          Fast, free, insured &mdash; and a guarantee with zero fine print.
+        </p>
+      </div>
+
+      {/* Steps grid */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((step, idx) => (
+          <div
+            key={idx}
+            className="relative rounded-2xl border border-stone-200 bg-stone-50 p-7"
+          >
+            <span className="absolute -left-3 -top-3 flex h-10 w-10 items-center justify-center rounded-xl bg-stone-900 font-extrabold text-white shadow-sm">
+              {step.num}
+            </span>
+            <div className="mb-4 mt-2 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100">
+              <step.icon className="h-6 w-6 text-amber-700" aria-hidden="true" />
+            </div>
+            <h3 className="mb-2 text-lg font-bold">{step.title}</h3>
+            <p className="text-sm leading-relaxed text-stone-600">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Detail panels */}
+      <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="rounded-2xl border-2 border-stone-200 p-6">
+          <div className="mb-3 flex items-center gap-2.5">
+            <MapPin className="h-5 w-5 text-stone-900" aria-hidden="true" />
+            <h4 className="font-bold">Where we ship</h4>
+          </div>
+          <p className="text-sm leading-relaxed text-stone-600">
+            All 50 US states via insured express carriers. Shipping somewhere else? Email us
+            before ordering and we will tell you what is possible.
           </p>
+          <a href="/shipping/" className="mt-3 inline-block text-sm font-bold text-blue-700 underline">
+            Full shipping policy
+          </a>
         </div>
 
-        {/* Steps grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {steps.map((step, idx) => (
-            <div
-              key={idx}
-              className="relative p-7 rounded-3xl bg-stone-50 border border-stone-200 hover:border-stone-300 hover:shadow-lg transition-all duration-300"
-            >
-              <span className="absolute -top-4 -left-4 w-11 h-11 rounded-2xl bg-stone-900 text-white flex items-center justify-center font-extrabold text-lg shadow-lg rotate-3">
-                {step.num}
-              </span>
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center mb-5 mt-2">
-                <step.icon className="w-6 h-6 text-amber-700" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-              <p className="text-sm text-stone-600 leading-relaxed">{step.desc}</p>
-            </div>
-          ))}
+        <div className="rounded-2xl border-2 border-stone-200 p-6">
+          <div className="mb-3 flex items-center gap-2.5">
+            <RotateCcw className="h-5 w-5 text-stone-900" aria-hidden="true" />
+            <h4 className="font-bold">Return policy</h4>
+          </div>
+          <p className="text-sm leading-relaxed text-stone-600">
+            {POLICY.returnDays} days from delivery, used or unused. Email us and we send a prepaid
+            label. Refunds are issued once the warehouse receives the ramp.
+          </p>
+          <a href="/returns/" className="mt-3 inline-block text-sm font-bold text-blue-700 underline">
+            Full returns policy
+          </a>
         </div>
 
-        {/* Detail panels */}
-        <div className="mt-12 grid md:grid-cols-3 gap-5">
-          <div className="p-6 rounded-3xl border-2 border-stone-200">
-            <div className="flex items-center gap-2.5 mb-3">
-              <MapPin className="w-5 h-5 text-stone-900" />
-              <h4 className="font-bold">Where We Ship</h4>
-            </div>
-            <p className="text-sm text-stone-600 leading-relaxed">
-              All 50 US states via insured express carriers. Canada and UK available at checkout —
-              duties calculated upfront so nothing surprises you at the door.
-            </p>
+        <div className="rounded-2xl border-2 border-stone-200 p-6">
+          <div className="mb-3 flex items-center gap-2.5">
+            <ShieldCheck className="h-5 w-5 text-stone-900" aria-hidden="true" />
+            <h4 className="font-bold">{POLICY.warrantyMonths}-month warranty</h4>
           </div>
-
-          <div className="p-6 rounded-3xl border-2 border-stone-200">
-            <div className="flex items-center gap-2.5 mb-3">
-              <RotateCcw className="w-5 h-5 text-stone-900" />
-              <h4 className="font-bold">Return Policy</h4>
-            </div>
-            <p className="text-sm text-stone-600 leading-relaxed">
-              30 days from delivery, used or unused. Email us and we send a prepaid label the same day.
-              Refunds are issued within 5 business days of the warehouse receiving the ramp.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-3xl border-2 border-stone-200">
-            <div className="flex items-center gap-2.5 mb-3">
-              <ShieldCheck className="w-5 h-5 text-stone-900" />
-              <h4 className="font-bold">1-Year Warranty</h4>
-            </div>
-            <p className="text-sm text-stone-600 leading-relaxed">
-              Every ramp is covered against manufacturing defects for a full year —
-              frame, surface, and hardware. The 30-day money-back guarantee is separate and unconditional.
-            </p>
-          </div>
+          <p className="text-sm leading-relaxed text-stone-600">
+            Every ramp is covered against manufacturing defects for {POLICY.warrantyMonths} months
+            &mdash; frame, surface, and hardware. The {POLICY.returnDays}-day money-back guarantee
+            is separate and unconditional.
+          </p>
+          <a href="/warranty/" className="mt-3 inline-block text-sm font-bold text-blue-700 underline">
+            Full warranty terms
+          </a>
         </div>
       </div>
     </section>

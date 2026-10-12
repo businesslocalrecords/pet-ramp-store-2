@@ -1,9 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { GATES } from '../lib/assets';
 
 /**
  * Video proof section — product demo with custom player controls.
- * Features: poster, play/pause overlay, progress bar, mute toggle, fullscreen.
+ *
+ * GATED (see the asset-gate pattern in src/lib/assets.ts): renders nothing
+ * until GATES.videoProof is enabled. The copy below — "Rocky", the "2 min 15 s"
+ * and "26° slope" stats — is placeholder narrative, NOT verified fact. When
+ * the owner's real demo clip lands, replace the copy with claims the video
+ * actually supports before flipping the gate.
  */
 export const VideoProof: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,6 +75,9 @@ export const VideoProof: React.FC = () => {
     video.currentTime = pos * video.duration;
   };
 
+  // Gate after the hooks so hook order is stable across renders.
+  if (!GATES.videoProof) return null;
+
   return (
     <section id="video" className="py-20 lg:py-24 bg-stone-900 text-stone-100 scroll-mt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -83,8 +92,9 @@ export const VideoProof: React.FC = () => {
             <span className="text-amber-400">Hesitant to Hop-In</span>
           </h2>
           <p className="mt-4 text-stone-400 text-lg">
-            An 11-year-old Labrador with arthritis. He used to refuse to get in the car.
-            This is his first week on the PawGrip Pro.
+            PLACEHOLDER — replace with a caption the real clip supports, e.g. the dog's name and
+            what the video actually shows. Do not describe an arthritis story the footage does
+            not evidence.
           </p>
         </div>
 
@@ -166,9 +176,9 @@ export const VideoProof: React.FC = () => {
         {/* Video proof points */}
         <div className="mt-10 grid sm:grid-cols-3 gap-6">
           {[
-            { k: '2 min 15 s', v: 'Average time for a dog to walk up unassisted' },
-            { k: '0 lbs', v: 'Lifting required — your back stays healthy' },
-            { k: '26° slope', v: 'Gentle angle vets recommend for joint safety' },
+            { k: '20–25°', v: 'Typical slope at SUV height (see the size finder)' },
+            { k: '150–250 lb', v: 'Published rating, by size' },
+            { k: '0 lbs', v: 'Lifting required — that is the point of a ramp' },
           ].map((item, i) => (
             <div key={i} className="text-center p-5 rounded-2xl bg-stone-800/60 border border-stone-800">
               <div className="text-2xl font-extrabold text-amber-400">{item.k}</div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TIERS, money, formatMoney } from '../lib/offers';
+import { TIERS, formatMoney, bundleSavings } from '../lib/offers';
 
 interface TieredOfferSelectorProps {
   selectedId: string;
@@ -13,6 +13,16 @@ interface TieredOfferSelectorProps {
  * Options stack directly with 1px dividers instead of floating as separate
  * cards, so the group reads as one connected decision table. The radio is a
  * native input so it is keyboard accessible and renders as a sharp circle.
+ *
+ * V3 HONESTY RULES
+ * ----------------
+ * - The MOST POPULAR / BEST VALUE labels are gone. Tier 'one' is the default
+ *   (see DEFAULT_TIER_ID) so no tier needs a manufactured rank.
+ * - "Save $x vs buying separately" is computed live from the individual item
+ *   prices (bundleSavings) and renders ONLY when the number is genuinely
+ *   positive. Tier 'one' saves nothing against itself, so it shows no badge.
+ * - The compare-at price stays (owner decision, see claims.md) but renders
+ *   muted and small: it anchors value without shouting "discount warehouse".
  */
 export const TieredOfferSelector: React.FC<TieredOfferSelectorProps> = ({
   selectedId,
@@ -23,7 +33,7 @@ export const TieredOfferSelector: React.FC<TieredOfferSelectorProps> = ({
     <div className="overflow-hidden rounded-md border border-gray-300 bg-white">
       {TIERS.map((tier, index) => {
         const isActive = selectedId === tier.id;
-        const savings = money(tier.compareAt - tier.price);
+        const savings = bundleSavings(tier);
 
         return (
           <label
@@ -57,23 +67,21 @@ export const TieredOfferSelector: React.FC<TieredOfferSelectorProps> = ({
                   <span className="block text-lg font-bold leading-none text-gray-900">
                     ${formatMoney(tier.price)}
                   </span>
-                  <span className="block text-sm text-gray-500 line-through">
+                  {/* Subtle compare-at anchor — muted, small, struck */}
+                  <span className="mt-0.5 block text-xs font-medium text-gray-400 line-through">
                     ${formatMoney(tier.compareAt)}
                   </span>
                 </div>
               </div>
 
-              {/* Sharp, explicit savings badge — same green as stock status */}
-              <div className="mt-1.5">
-                <span className="inline-block bg-[#008C3A] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-                  Save ${formatMoney(savings)}
-                </span>
-                {tier.badge && (
-                  <span className="ml-2 inline-block bg-gray-900 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-                    {tier.badge}
+              {/* Savings badge only when the bundle genuinely saves money */}
+              {savings > 0 && (
+                <div className="mt-1.5">
+                  <span className="inline-block bg-[#008C3A] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+                    Save ${formatMoney(savings)} vs buying separately
                   </span>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Sub-items / what this tier contains */}
               <p className="mt-2 text-xs leading-relaxed text-gray-600">{tier.sublabel}</p>

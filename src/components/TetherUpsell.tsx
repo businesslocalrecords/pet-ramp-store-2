@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatMoney } from '../lib/offers';
+import { formatMoney, money, ADDON_COMPARE_AT, PRODUCT_NAMES } from '../lib/offers';
 
 interface TetherUpsellProps {
   /** Whether the live tether variant loaded from the storefront. */
@@ -10,10 +10,14 @@ interface TetherUpsellProps {
 }
 
 /**
- * Post-add-to-cart upsell: crash-tested car safety tether.
+ * Post-add-to-cart upsell: car safety tether.
  *
- * $19.99 against a $35.00 compare-at. Rendered as an add-on row in the same
- * register as the traction-mat bump, so multiple add-ons form one visual group.
+ * Renamed to "Adjustable Car Safety Tether" per the owner's decision (the
+ * "crash-tested" wording overstates what the store can evidence). The Shopify
+ * handle stays `crash-tested-adjustable-car-safety-tether` so existing carts
+ * and the seeder's idempotency keep working — see PRODUCT_HANDLES.
+ *
+ * The savings figure is computed from the real compare-at price.
  */
 export const TetherUpsell: React.FC<TetherUpsellProps> = ({
   available,
@@ -21,6 +25,9 @@ export const TetherUpsell: React.FC<TetherUpsellProps> = ({
   onToggle,
   price,
 }) => {
+  const compareAt = ADDON_COMPARE_AT.carTether;
+  const savings = money(Math.max(0, compareAt - price));
+
   return (
     <div
       className={`mt-3 flex items-start gap-3 rounded-md border border-gray-300 bg-gray-50 p-4 ${
@@ -40,15 +47,15 @@ export const TetherUpsell: React.FC<TetherUpsellProps> = ({
           <span className="bg-gray-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             Add for ${formatMoney(price)}
           </span>
-          <span className="text-[0.8125rem] font-bold text-gray-900">
-            Crash-Tested Car Safety Tether
-          </span>
+          <span className="text-[0.8125rem] font-bold text-gray-900">{PRODUCT_NAMES.tether}</span>
         </div>
 
         <p className="mt-1 text-xs leading-relaxed text-gray-600">
-          A ramp protects the joints on the way in &mdash; a tested tether keeps them safe the whole
-          drive. Attaches to any harness. <span className="font-bold text-gray-900">Save $15</span> on
-          this order.
+          A ramp protects the joints on the way in &mdash; a tether keeps your dog secured for the
+          whole drive. Attaches to any harness with a rear clip. Normally ${formatMoney(compareAt)}{' '}
+          &mdash;{' '}
+          {savings > 0 && <span className="font-bold text-gray-900">save ${formatMoney(savings)}</span>}
+          {savings > 0 ? ' on this order.' : ' included with this order.'}
         </p>
 
         {!available && (
