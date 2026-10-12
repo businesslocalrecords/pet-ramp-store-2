@@ -1,0 +1,22 @@
+# Netlify build configuration for the PawGrip Pro storefront (prototype 2).
+#
+# Vite inlines import.meta.env.VITE_* variables at BUILD time, so the five
+# site variables must be set in Netlify's dashboard (Site configuration ->
+# Environment variables) and a NEW deploy triggered whenever they change.
+# Refreshing the page does nothing.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Pinned to match the local toolchain (Vite 8, TypeScript ~6, oxlint).
+  # Bump this if you upgrade the toolchain.
+  NODE_VERSION = "22"
+
+# The site is a single client-rendered page with no router, so no SPA
+# rewrite is required. This rule is future-proofing in case routes are added.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

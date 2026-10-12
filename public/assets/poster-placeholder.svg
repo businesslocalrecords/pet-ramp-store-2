@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1C1917"/>
+      <stop offset="100%" stop-color="#292524"/>
+    </linearGradient>
+    <linearGradient id="pramp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#57534E"/>
+      <stop offset="100%" stop-color="#44403C"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#pbg)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+
+  <!-- Symmetric grid backdrop -->
+  <g opacity="0.08" stroke="#FAFAF9" stroke-width="1">
+    <line x1="0" y1="150" x2="1600" y2="150"/>
+    <line x1="0" y1="300" x2="1600" y2="300"/>
+    <line x1="0" y1="450" x2="1600" y2="450"/>
+    <line x1="0" y1="600" x2="1600" y2="600"/>
+    <line x1="0" y1="750" x2="1600" y2="750"/>
+    <line x1="320" y1="0" x2="320" y2="900"/>
+    <line x1="640" y1="0" x2="640" y2="900"/>
+    <line x1="960" y1="0" x2="960" y2="900"/>
+    <line x1="1280" y1="0" x2="1280" y2="900"/>
+  </g>
+
+  <!-- Car (dark silhouette) -->
+  <g opacity="0.9">
+    <path d="M950 470 Q970 380 1080 368 L1330 368 Q1430 374 1468 470 L1490 640 L950 640 Z" fill="#0C0A09"/>
+    <path d="M1010 400 Q1028 350 1080 342 L1300 342 Q1360 348 1392 400 Z" fill="#1C1917"/>
+    <circle cx="1080" cy="650" r="44" fill="#0C0A09"/>
+    <circle cx="1380" cy="650" r="44" fill="#0C0A09"/>
+    <rect x="1478" y="500" width="16" height="38" rx="8" fill="#DC2626"/>
+  </g>
+
+  <!-- Ramp -->
+  <path d="M180 690 L940 500 L956 528 L196 720 Z" fill="url(#pramp)"/>
+  <g stroke="#A8A29E" stroke-width="2" opacity="0.4">
+    <line x1="280" y1="656" x2="292" y2="690"/>
+    <line x1="390" y1="612" x2="402" y2="646"/>
+    <line x1="500" y1="568" x2="512" y2="602"/>
+    <line x1="610" y1="524" x2="622" y2="558"/>
+    <line x1="720" y1="480" x2="732" y2="514"/>
+    <line x1="830" y1="436" x2="842" y2="470"/>
+  </g>
+
+  <!-- Dog mid-stride on ramp (illustrated) -->
+  <g opacity="0.95">
+    <ellipse cx="520" cy="566" rx="115" ry="55" fill="#FAFAF9"/>
+    <circle cx="588" cy="570" r="48" fill="#E7E5E4"/>
+    <circle cx="452" cy="566" r="46" fill="#FAFAF9"/>
+    <rect x="430" y="598" width="18" height="72" rx="9" fill="#FAFAF9"/>
+    <rect x="580" y="598" width="20" height="72" rx="10" fill="#E7E5E4"/>
+    <path d="M430 528 Q415 492 400 466 L434 458 Q458 492 466 528 Z" fill="#FAFAF9"/>
+    <ellipse cx="398" cy="470" rx="52" ry="43" fill="#FAFAF9"/>
+    <ellipse cx="352" cy="480" rx="26" ry="18" fill="#E7E5E4"/>
+    <circle cx="342" cy="475" r="7" fill="#1C1917"/>
+    <path d="M378 432 Q358 396 384 402 Q398 414 396 434 Z" fill="#D6D3D1"/>
+    <path d="M418 430 Q438 398 418 406 Q404 414 402 434 Z" fill="#E7E5E4"/>
+    <circle cx="382" cy="460" r="5" fill="#1C1917"/>
+    <path d="M640 550 Q695 512 712 456 Q722 482 702 528 Q688 562 642 570 Z" fill="#E7E5E4"/>
+  </g>
+
+  <!-- Big play button -->
+  <g transform="translate(800,450)">
+    <circle r="90" fill="#FAFAF9" opacity="0.1"/>
+    <circle r="68" fill="#FAFAF9"/>
+    <path d="M-24 -34 L44 0 L-24 34 Z" fill="#1C1917"/>
+  </g>
+
+  <!-- Duration chip -->
+  <g transform="translate(1460,800)">
+    <rect width="86" height="34" rx="8" fill="#0C0A09" opacity="0.85"/>
+    <text x="43" y="23" font-family="system-ui" font-size="15" font-weight="600" fill="#FAFAF9" text-anchor="middle">0:32</text>
+  </g>
+</svg>

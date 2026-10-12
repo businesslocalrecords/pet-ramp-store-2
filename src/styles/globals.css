@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+@theme {
+  --color-brand-50: #FFFBEB;
+  --color-brand-100: #FEF3C7;
+  --color-brand-200: #FDE68A;
+  --color-brand-300: #FCD34D;
+  --color-brand-400: #FBBF24;
+  --color-brand-500: #F59E0B;
+  --color-brand-600: #D97706;
+  --color-brand-700: #B45309;
+  --color-brand-800: #92400E;
+  --color-brand-900: #78350F;
+
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==========================================================================
+   Base Typography
+   Mathematical, high-trust type scale.
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tight kerning on headings */
+h1, h2, h3, h4 {
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+/* Readable body copy */
+p {
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   Keyframes
+   ========================================================================== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes star-pop {
+  0% { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  70% { transform: scale(1.25) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes pulse-once {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ==========================================================================
+   Animation Utilities
+   ========================================================================== */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s var(--ease-snap) both;
+}
+
+.animate-star-pop {
+  opacity: 0;
+  animation: star-pop 0.55s var(--ease-snap) both;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-once {
+  animation: pulse-once 1.4s ease-in-out 2;
+}
+
+.text-shimmer {
+  background: linear-gradient(100deg, currentColor 20%, rgb(251 191 36 / 90%) 45%, currentColor 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ==========================================================================
+   Component Utilities
+   ========================================================================== */
+
+/* Hard-offset shadow — the store's signature "geometric" card style */
+.shadow-hard {
+  box-shadow: 6px 6px 0 0 rgb(28 25 23 / 1);
+}
+
+.shadow-hard-amber {
+  box-shadow: 6px 6px 0 0 rgb(245 158 11 / 1);
+}
+
+.shadow-hard-lg {
+  box-shadow: 8px 8px 0 0 rgb(28 25 23 / 1);
+}
+
+/* Subtle dotted grid backdrop for symmetric geometry */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, rgb(214 211 209 / 60%) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Hide scrollbars for horizontal UGC / carousel swiping */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-star-pop { opacity: 1; }
+}
+
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
