@@ -91,7 +91,7 @@ const Page: React.FC = () => {
               id="offer"
               className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
             >
-              <div className="bg-white p-6 shadow-sm sm:p-6">
+              <div className="mx-auto max-w-lg rounded-md border border-gray-300 bg-white p-6 shadow-sm">
                 <BuyBox />
               </div>
 
