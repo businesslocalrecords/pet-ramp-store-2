@@ -87,7 +87,7 @@ export const Footer: React.FC = () => {
           </p>
           <a
             href="#offer"
-            className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-9 py-4 text-lg font-extrabold text-stone-900 shadow-[0_6px_0_0_#047857] transition-all hover:bg-emerald-400 active:translate-y-1.5 active:shadow-[0_0px_0_0_#047857]"
+            className="mt-7 inline-flex items-center gap-2 rounded-md bg-[#F37021] px-9 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-[#D95E1A]"
           >
             Get the PawGrip Pro
           </a>

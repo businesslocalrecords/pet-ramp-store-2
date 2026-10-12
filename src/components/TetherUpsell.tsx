@@ -1,5 +1,4 @@
 import React from 'react';
-import { ShieldCheck, Plus, Car } from 'lucide-react';
 import { formatMoney } from '../lib/offers';
 
 interface TetherUpsellProps {
@@ -13,8 +12,8 @@ interface TetherUpsellProps {
 /**
  * Post-add-to-cart upsell: crash-tested car safety tether.
  *
- * Target $19.99 against a $35.00 compare-at. Offered to shoppers who are
- * already buying car-mobility gear, where the attachment rate is highest.
+ * $19.99 against a $35.00 compare-at. Rendered as an add-on row in the same
+ * register as the traction-mat bump, so multiple add-ons form one visual group.
  */
 export const TetherUpsell: React.FC<TetherUpsellProps> = ({
   available,
@@ -24,56 +23,40 @@ export const TetherUpsell: React.FC<TetherUpsellProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-2xl border-2 p-4 transition-colors ${
-        available ? 'border-blue-600 bg-blue-50/60' : 'border-gray-900/10 opacity-60'
+      className={`mt-3 flex items-start gap-3 rounded-md border border-gray-300 bg-gray-50 p-4 ${
+        available ? '' : 'opacity-60'
       }`}
     >
-      <label className="flex cursor-pointer items-start gap-3">
-        <input
-          type="checkbox"
-          checked={enabled}
-          disabled={!available}
-          onChange={(e) => onToggle(e.target.checked)}
-          className="mt-0.5 h-5 w-5 shrink-0 rounded border-blue-300 text-blue-600 focus:ring-blue-500"
-        />
+      <input
+        type="checkbox"
+        checked={enabled}
+        disabled={!available}
+        onChange={(e) => onToggle(e.target.checked)}
+        className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-sm border-gray-400 text-blue-700 focus:ring-blue-700"
+      />
 
-        <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-center gap-x-2">
-            <span className="rounded-md bg-blue-600 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-widest text-white">
-              Add for ${formatMoney(price)}
-            </span>
-            <span className="text-[0.8125rem] font-bold text-stone-900">
-              Crash-Tested Car Safety Tether
-            </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="bg-gray-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+            Add for ${formatMoney(price)}
           </span>
-
-          <span className="mt-1.5 flex items-start gap-1.5 text-xs leading-relaxed text-stone-600">
-            <Car className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" aria-hidden="true" />
-            <span>
-              A ramp keeps their joints safe on the way in — a tested tether keeps them
-              safe the whole drive. Attaches to any harness. <span className="font-bold text-stone-900">Save $15</span> when
-              added to this order.
-            </span>
+          <span className="text-[0.8125rem] font-bold text-gray-900">
+            Crash-Tested Car Safety Tether
           </span>
+        </div>
 
-          {!available && (
-            <span className="mt-1.5 block text-[11px] font-medium text-stone-500">
-              Unavailable until the <code>crash-tested-adjustable-car-safety-tether</code> product is created.
-            </span>
-          )}
-        </span>
+        <p className="mt-1 text-xs leading-relaxed text-gray-600">
+          A ramp protects the joints on the way in &mdash; a tested tether keeps them safe the whole
+          drive. Attaches to any harness. <span className="font-bold text-gray-900">Save $15</span> on
+          this order.
+        </p>
 
-        <span
-          aria-hidden="true"
-          className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-100 ring-1 ring-blue-200 sm:flex"
-        >
-          {enabled ? (
-            <ShieldCheck className="h-6 w-6 text-blue-700" />
-          ) : (
-            <Plus className="h-5 w-5 text-blue-600" />
-          )}
-        </span>
-      </label>
+        {!available && (
+          <p className="mt-1 text-[11px] font-medium text-gray-500">
+            Unavailable until the <code>crash-tested-adjustable-car-safety-tether</code> product exists.
+          </p>
+        )}
+      </div>
     </div>
   );
 };

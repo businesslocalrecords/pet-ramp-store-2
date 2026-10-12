@@ -1,5 +1,4 @@
 import React from 'react';
-import { Plus, Gift } from 'lucide-react';
 import { formatMoney } from '../lib/offers';
 
 interface OrderBumpProps {
@@ -11,79 +10,61 @@ interface OrderBumpProps {
   onToggle: (next: boolean) => void;
   /** Bump price in dollars. */
   price?: number;
-  /** True once the live cart write has resolved, if you sync on toggle. */
-  syncing?: boolean;
 }
 
 /**
- * Pre-checkout order bump.
+ * Pre-checkout order bump, rendered as a catalog "add-on item" row rather
+ * than a standalone promotional box. It sits inside the same visual register
+ * as the tier list so the bump reads as part of the checkout, not a detour.
  *
  * Deliberately a *controlled* toggle: it does not write to the cart on click.
  * The buy handler performs one atomic cart write (ramp + mat together), which
  * avoids a race condition where a fast double-click creates duplicate lines.
- * The net effect for the shopper is identical, just deterministic.
  */
 export const OrderBump: React.FC<OrderBumpProps> = ({
   matVariantId,
   enabled,
   onToggle,
   price = 15,
-  syncing = false,
 }) => {
   const unavailable = !matVariantId;
 
   return (
     <div
-      className={`rounded-2xl border-2 bg-red-50 p-4 transition-colors ${
-        unavailable ? 'border-red-200 opacity-60' : 'border-red-500'
+      className={`mt-3 flex items-start gap-3 rounded-md border border-gray-300 bg-gray-50 p-4 ${
+        unavailable ? 'opacity-60' : ''
       }`}
     >
-      <label className="flex cursor-pointer items-start gap-3">
-        <input
-          type="checkbox"
-          checked={enabled}
-          disabled={unavailable}
-          onChange={(e) => onToggle(e.target.checked)}
-          className="mt-0.5 h-5 w-5 shrink-0 rounded border-red-300 text-red-600 focus:ring-red-500"
-        />
+      {/* Sharp square checkbox */}
+      <input
+        type="checkbox"
+        checked={enabled}
+        disabled={unavailable}
+        onChange={(e) => onToggle(e.target.checked)}
+        className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-sm border-gray-400 text-blue-700 focus:ring-blue-700"
+      />
 
-        <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-center gap-x-2">
-            <span className="rounded-md bg-red-600 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-widest text-white">
-              Add for ${formatMoney(price)}
-            </span>
-            <span className="text-[0.8125rem] font-bold text-stone-900">
-              Yes! Add the Custom Non-Slip Mat
-            </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="bg-gray-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+            Add for ${formatMoney(price)}
           </span>
-
-          <span className="mt-1.5 flex items-start gap-1.5 text-xs leading-relaxed text-stone-600">
-            <Gift className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" aria-hidden="true" />
-            <span>
-              One-time offer &mdash; locks the ramp in place on smooth garage floors and
-              protects your bumper. <span className="font-bold text-stone-900">Save $34</span> when
-              added to this order (normally $49).
-            </span>
+          <span className="text-[0.8125rem] font-bold text-gray-900">
+            Heavy-Duty Traction Mat (2-Pack)
           </span>
+        </div>
 
-          {unavailable && (
-            <span className="mt-1.5 block text-[11px] font-medium text-red-700">
-              Mat unavailable &mdash; configure the <code>non-slip-mat</code> product in Shopify.
-            </span>
-          )}
-          {syncing && (
-            <span className="mt-1.5 block text-[11px] font-medium text-stone-500">Updating cart…</span>
-          )}
-        </span>
+        <p className="mt-1 text-xs leading-relaxed text-gray-600">
+          Locks the ramp to smooth garage floors and protects your bumper. One-time add-on,
+          normally $30 &mdash; <span className="font-bold text-gray-900">save $15</span> on this order.
+        </p>
 
-        {/* Thumbnail slot */}
-        <span
-          aria-hidden="true"
-          className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-red-100 ring-1 ring-red-200 sm:flex"
-        >
-          <Plus className="h-5 w-5 text-red-500" />
-        </span>
-      </label>
+        {unavailable && (
+          <p className="mt-1 text-[11px] font-medium text-gray-500">
+            Unavailable until the <code>heavy-duty-traction-mat-upgrade-2-pack</code> product exists in Shopify.
+          </p>
+        )}
+      </div>
     </div>
   );
 };

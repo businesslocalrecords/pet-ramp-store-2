@@ -9,10 +9,11 @@ import { formatMoney } from '../lib/offers';
  * right-hand purchase column stays sticky instead.
  *
  * Driven by PurchaseProvider, so it shows exactly the same total and performs
- * exactly the same checkout action as the desktop buy button.
+ * exactly the same checkout action as the desktop buy button. Styled in the
+ * same institutional register: flat orange, solid background, no blur.
  */
 export const StickyMobileBuyBar: React.FC = () => {
-  const { tier, total, buying, buy } = usePurchase();
+  const { total, buying, buy } = usePurchase();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -28,21 +29,21 @@ export const StickyMobileBuyBar: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="animate-slide-up fixed inset-x-0 bottom-0 z-40 border-t border-gray-900/10 bg-white/75 px-4 py-3 backdrop-blur-xl md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-300 bg-white px-4 py-3 md:hidden">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-extrabold leading-none text-stone-900">${formatMoney(total)}</span>
-            <span className="text-xs text-stone-400 line-through">${formatMoney(tier.compareAt)}</span>
+            <span className="text-xl font-bold leading-none text-gray-900">${formatMoney(total)}</span>
+            <span className="text-xs text-gray-500">free shipping</span>
           </div>
-          <p className="text-[11px] text-emerald-600">Ships free in 24 hours</p>
+          <p className="text-[11px] font-medium text-[#008C3A]">In stock — ships 24h</p>
         </div>
 
         <button
           type="button"
           onClick={buy}
           disabled={buying}
-          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-extrabold text-white shadow-[0_4px_0_0_#047857] transition-all active:translate-y-1 active:shadow-[0_0px_0_0_#047857] disabled:opacity-60"
+          className="flex shrink-0 items-center gap-1.5 rounded-md bg-[#F37021] px-5 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#D95E1A] disabled:opacity-60"
         >
           {buying ? (
             'Processing…'
